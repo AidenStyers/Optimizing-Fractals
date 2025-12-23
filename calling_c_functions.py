@@ -4,4 +4,6 @@ so_file = "C:/Users/aiden/Fractals/my_functions.so"
 
 my_functions = CDLL(so_file)
 
-print(my_functions.square(4))
+fileName = "test.png"
+
+my_functions.greyscaleFractal(fileName.encode('utf-8'), 0, 1, 0, 1, 100, 100, 100)
