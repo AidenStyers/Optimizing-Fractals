@@ -4,6 +4,8 @@
 #include <iostream>
 #include <vector>
 #include "lodepng.h"
+#include <cmath>
+#include <complex>
 
 
 
@@ -11,33 +13,47 @@
 
 // Functions which can be called by external script
 extern "C" {
-	
-	int square(int x) {
-        return x * x;
-    }
 
-    struct vect {
-        float x;
-        float y;
-    };
+    // Generates a black and white fractal with the following specifications, puts the data in pixelData
+    void generateGreyscaleFractal( std::vector<unsigned char>& pixelData, float minX, float maxX, float minY, float maxY, int xPixels, int yPixels, std::complex<float> (*iterator)(std::complex<float>, std::complex<float>), int maxIter) {
 
-    vect mandelbrotIter(vect z, vect c) {
-        vect output;
-        output.x = c.x + z.x * z.x - z.y * z.y;
-        output.y = c.y + 2 * z.x * z.y;
-        return output;
-    }
-
-    void generateGreyscaleFractal( std::vector<unsigned char>& pixelData, float minX, float maxX, float minY, float maxY, int xPixels, int yPixels, vect (*iterator)(vect, vect), int maxIter) {
+        std::complex<float> startPosition;
+        std::complex<float> iterate;
+        int small;
 
         for (int row = 0; row < yPixels; row++) {
+            
+            startPosition.imag( maxY - row * ( (maxY-minY) / yPixels ) );
+
             for (int col = 0; col < xPixels; col++) {
 
-                pixelData[row * xPixels * 4 + col * 4 + 0] = (unsigned char)row; // R
-                pixelData[row * xPixels * 4 + col * 4 + 1] = (unsigned char)col; // G
-                pixelData[row * xPixels * 4 + col * 4 + 2] = 100;              // B
-                pixelData[row * xPixels * 4 + col * 4 + 3] = 255;              // A
+                startPosition.real( minX + col * ( (maxX-minX) / xPixels ) );
+                
+                iterate = startPosition;
 
+                small = 1;
+
+                for (int i = 0; i < maxIter; i++) {
+                    if (std::norm(iterate) > 4) {
+                        small = 0;
+                        break;
+                    }
+                    iterate = iterate * iterate * iterate + iterate * iterate;
+                }
+
+                if (small == 0) {
+                    pixelData[row * xPixels * 4 + col * 4 + 0] = 255; // R
+                    pixelData[row * xPixels * 4 + col * 4 + 1] = 255; // G
+                    pixelData[row * xPixels * 4 + col * 4 + 2] = 255; // B
+                    pixelData[row * xPixels * 4 + col * 4 + 3] = 255; // A
+                }
+                if (small == 1) {
+                    pixelData[row * xPixels * 4 + col * 4 + 0] = 0; // R
+                    pixelData[row * xPixels * 4 + col * 4 + 1] = 0; // G
+                    pixelData[row * xPixels * 4 + col * 4 + 2] = 0; // B
+                    pixelData[row * xPixels * 4 + col * 4 + 3] = 255; // A
+                }
+                
             }
         }
         
@@ -48,7 +64,7 @@ extern "C" {
         std::vector<unsigned char> pixelData(xPixels * yPixels * 4);
 
         // Set the mandelbrot as default iterator TODO: MAKE THIS DYNAMIC
-        vect (*iterator)(vect, vect) = &mandelbrotIter;
+        std::complex<float> (*iterator)(std::complex<float>,std::complex<float>) = NULL;
 
         // Call generateGreyScaleFractal on pixelData
         generateGreyscaleFractal(pixelData, minX, maxX, minY, maxY, xPixels, yPixels, iterator, maxIter);
