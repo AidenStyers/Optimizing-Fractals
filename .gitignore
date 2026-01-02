@@ -1,0 +1,6 @@
+Release/**
+*.png
+lodepng.h
+lodepng.cpp
+lodepng.obj
+build/**

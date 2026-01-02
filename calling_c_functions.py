@@ -1,6 +1,6 @@
 from ctypes import *
 
-so_file = "C:/Users/aiden/Fractals/my_functions.so"
+so_file = r"C:/Users/aiden/Fractals/fractal_generation.dll"
 
 my_functions = CDLL(so_file)
 
