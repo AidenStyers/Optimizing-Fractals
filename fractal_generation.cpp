@@ -150,11 +150,56 @@ extern "C" {
     }
 
     // Generates a simplefractal with the input parameters using generateBoolFractal
-    // Then find how 'cool' the result is nad returns that
+    // Then find how 'cool' the result is and returns that
     __declspec(dllexport)
-    int coolness(float* parameters) {
-        std::cout << "Ran successfully" << std::endl;
-        return 3;
+    int coolness(float* parameters, int pixels) {
+
+        // Create array to be filled with fractal data
+        std::vector<bool> boolArray(pixels*pixels);
+
+        // Take apart input array to make parameter array
+        std::complex<float> coeffs[3][3][3];
+
+        for (int i = 0; i < 27; i++) {
+            coeffs[i%3][(i%9)/3][i/9] = std::complex<float>(parameters[i],parameters[i+1]);
+        }
+
+        // Call generateBoolFractal
+        generateBoolFractal(boolArray, coeffs, 30, pixels);
+
+
+        // Find 'coolness'
+        int count = 0;
+
+        for (int row = 0; row < pixels-1; row++) {
+
+            for (int col = 0; col < pixels-1; col++) {
+                
+                if (boolArray[row*pixels + col] != boolArray[row*pixels+col+1]) {
+                    count++;
+                }
+
+                if (boolArray[row*pixels + col] != boolArray[(row+1)*pixels+col]) {
+                    count++;
+                }
+                
+            }
+
+            if (boolArray[row*pixels + (pixels - 1)] != boolArray[(row+1)*pixels + (pixels - 1)]) {
+                count++;
+            }
+        }
+
+        for (int col = 0; col < pixels-1; col++) {
+                
+            if (boolArray[(pixels-1)*pixels + col] != boolArray[(pixels-1)*pixels+col+1]) {
+                count++;
+            }
+                
+        }
+
+        return count;
+
     }
 
     // Tests generateBoolFractal on the mandelbrot set, doesn't actually run tests it just returns a ton of info about what was generated

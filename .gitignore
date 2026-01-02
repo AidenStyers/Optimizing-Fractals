@@ -4,3 +4,5 @@ lodepng.h
 lodepng.cpp
 lodepng.obj
 build/**
+testCPlus.cpp
+testcallingC.py
