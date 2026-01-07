@@ -289,5 +289,168 @@ extern "C" {
         }
     }
 
+    // Generates an image using generateBoolFractal's data
+    __declspec(dllexport)
+    int formattedGreyscaleFractal(const char* outputFile, float* parameters, int pixels) {
+
+        // Take apart input array to make parameter array
+        std::complex<float> coeffs[3][3][3];
+
+        for (int i = 0; i < 27; i++) {
+            coeffs[i%3][(i%9)/3][i/9] = std::complex<float>(parameters[2*i],parameters[2*i+1]);
+        }
+
+        // Create array to be filled with fractal
+        std::vector<bool> boolData(pixels * pixels);
+
+        // Call generateGreyScaleFractal on boolData
+        generateBoolFractal(boolData, coeffs, 30, pixels);
+
+        // Convert it to an array of RGB values
+        std::vector<unsigned char> pixelData(pixels * pixels * 4);
+
+        for (int row = 0; row < pixels; row++) {
+            for (int col = 0; col < pixels; col++) {
+
+                if (boolData[row * pixels + col]) {
+                    pixelData[row * pixels * 4 + col * 4 + 0] = 0; // R
+                    pixelData[row * pixels * 4 + col * 4 + 1] = 0; // G
+                    pixelData[row * pixels * 4 + col * 4 + 2] = 0; // B
+                    pixelData[row * pixels * 4 + col * 4 + 3] = 255; // A
+                }
+                else {
+                    pixelData[row * pixels * 4 + col * 4 + 0] = 255; // R
+                    pixelData[row * pixels * 4 + col * 4 + 1] = 255; // G
+                    pixelData[row * pixels * 4 + col * 4 + 2] = 255; // B
+                    pixelData[row * pixels * 4 + col * 4 + 3] = 255; // A
+                }
+            }
+        }
+
+
+        // Save pixelData to PNG image
+        unsigned error = lodepng::encode(outputFile, pixelData, pixels, pixels);
+
+        //if there's an error, display it
+        if (error) std::cout << "encoder error " << error << ": " << lodepng_error_text(error) << std::endl;
+
+        // Successful return message
+        return 1;
+    }
+
+
+    // Creates an vector of 0/1 values for a fractal, faster and easier to evaluate structure
+    // Output stored in boolArray
+    // Range set to [-2,2]^2
+    // Coefficents of function to be iterated are in 3D array of floats coeffs
+    // pixelSplit gives the resolution of the fractal, generates a pixelxpixel array
+    __declspec(dllexport)
+    int formattedFractal(const char* outputFile, float* parameters, float xPosition, float yPosition, float radius, int maxIter, int pixels) {
+
+
+        // Unpack the input parameters into the coeffs array
+        std::complex<float> coeffs[3][3][3];
+
+        for (int i = 0; i < 27; i++) {
+            coeffs[i%3][(i%9)/3][i/9] = std::complex<float>(parameters[2*i],parameters[2*i+1]);
+        }
+
+        // Array to be filled with image
+        std::vector<unsigned char> pixelData(pixels * pixels * 4);
+
+        // Values to be iterated on to generate fractal
+        std::complex<float> c(xPosition - radius, yPosition + radius);
+        std::complex<float> z;
+        std::complex<float> zb;
+        float norm;
+
+        // True/false indicator for if values diverge
+        int diverged;
+
+        // Amount to change the starting real and imaginary values each iteration of the loop
+        float realDelta = 2.0 * radius / pixels;
+        std::complex<float> imagDelta(0, -2.0 * radius / pixels);
+
+        for (int row = 0; row < pixels; row++) {
+
+            for (int col = 0; col < pixels; col++) {
+
+                z = 0;
+                zb = 0;
+                norm = 0;
+
+                diverged = 0;
+
+                for (int iteration = 0; iteration < maxIter; iteration++) {
+
+                    
+                    // Add all 26 terms to iterate z
+                    // Wrote these out manually to make it faster????? Maybe??
+                    z = 
+                    coeffs[1][0][0]*c + coeffs[2][0][0]*c*c +
+
+                    coeffs[0][1][0]*z + coeffs[1][1][0]*c*z + coeffs[2][1][0]*c*c*z +
+                    coeffs[0][0][1]*zb + coeffs[1][0][1]*c*zb + coeffs[2][0][1]*c*c*zb +
+
+                    coeffs[0][2][0]*z*z + coeffs[1][2][0]*c*z*z + coeffs[2][2][0]*c*c*z*z +
+                    coeffs[0][0][2]*zb*zb + coeffs[1][0][2]*c*zb*zb + coeffs[2][0][2]*c*c*zb*zb +
+                    coeffs[0][1][1]*z*zb  + coeffs[1][1][1]*c*z*zb + coeffs[2][1][1]*c*c*z*zb +
+
+                    coeffs[0][2][1]*z*z*zb  + coeffs[1][2][1]*c*z*z*zb + coeffs[2][2][1]*c*c*z*z*zb +
+                    coeffs[0][1][2]*z*zb*zb  + coeffs[1][1][2]*c*z*zb*zb + coeffs[2][1][2]*c*c*z*zb*zb +
+
+                    coeffs[0][2][2]*z*z*zb*zb  + coeffs[1][2][2]*c*z*z*zb*zb + coeffs[2][2][2]*c*c*z*z*zb*zb;
+
+                    // Find conjugate and norm of z
+                    zb = std::conj(z);
+                    norm = z.real() * z.real() + z.imag() * z.imag();
+
+                    // Check if z has grown large
+                    if (norm > 10000) {
+                        diverged = 1;
+                        break;
+                    }
+
+                }
+
+                if (diverged) {
+                    pixelData[row * pixels * 4 + col * 4 + 0] = 255; // R
+                    pixelData[row * pixels * 4 + col * 4 + 1] = 255; // G
+                    pixelData[row * pixels * 4 + col * 4 + 2] = 255; // B
+                    pixelData[row * pixels * 4 + col * 4 + 3] = 255; // A
+                    
+                }
+                else {
+                    pixelData[row * pixels * 4 + col * 4 + 0] = 0; // R
+                    pixelData[row * pixels * 4 + col * 4 + 1] = 0; // G
+                    pixelData[row * pixels * 4 + col * 4 + 2] = 0; // B
+                    pixelData[row * pixels * 4 + col * 4 + 3] = 255; // A   
+                }
+
+                // Increase c.real
+                c += realDelta;               
+            }
+            
+            // Lower c.imag
+            c += imagDelta;
+
+            // Reset c.real
+            c.real(xPosition - radius);
+        }
+
+
+
+        // Save pixelData to PNG image
+        unsigned error = lodepng::encode(outputFile, pixelData, pixels, pixels);
+
+        //if there's an error, display it
+        if (error) std::cout << "encoder error " << error << ": " << lodepng_error_text(error) << std::endl;
+
+        // Successful return message
+        return 4;
+
+    }
+
+
 }
 
