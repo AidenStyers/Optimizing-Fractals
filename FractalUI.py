@@ -10,17 +10,11 @@ from numpy.ctypeslib import ndpointer
 fractal_generation_functions = CDLL("C:/Users/aiden/Fractals/Release/fractal_generation.dll")
 
 # Define input and output types for functions with array inputs
-
-# Class used to pass tuples from C functions
-class fractalData(Structure):
-    _fields_ = [("size", c_int),
-                ("coolness", c_int)]
-
 fractal_generation_functions.coolness.argtypes = [
     ndpointer(dtype=np.float32, flags="C_CONTIGUOUS"),
     c_int
 ]
-fractal_generation_functions.coolness.restype = fractalData
+fractal_generation_functions.coolness.restype = int
 
 
 fractal_generation_functions.formattedGreyscaleFractal.argtypes = [
@@ -54,10 +48,33 @@ parameters = np.array([-0.59873605, -0.523377  , -0.8273191 , -0.44887334, -0.44
         0.8369143 , -0.32329178,  0.8245339 , -0.22968203, -0.01218032,
         0.6385087 , -0.55122054,  0.40428516,  0.54691684], dtype=c_float)
 
+betterParameters = [np.float64(0.306130926411601),
+ np.float64(-1.694189262350915),
+ np.float64(-0.11008876934572466),
+ np.float64(0.03297363955160642),
+ np.float64(0.018925388611936697),
+ np.float64(-0.3096979497254595)]
+
+parameters = np.array([0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                       0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0,
+                       0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                       0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                       0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                       0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                       0.0, 0.0, 0.0, 0.0, 0.0, 0.0], dtype=c_float)
+
+# Generate coefficients 
+parameters[2] = betterParameters[0]
+parameters[3] = betterParameters[1]
+parameters[12] = betterParameters[2]
+parameters[13] = betterParameters[3]
+parameters[18] = betterParameters[4]
+parameters[19] = betterParameters[5]
+
 # Function which reloads the image based on global parameters
 def reload_image():
     global x_coord, y_coord, radius, parameters
-    fractal_generation_functions.formattedFractal("test.png".encode('utf-8'), parameters, x_coord, y_coord, radius, 30, 800)
+    fractal_generation_functions.formattedFractal("test.png".encode('utf-8'), parameters, x_coord, y_coord, radius, 100, 800)
 
 
 

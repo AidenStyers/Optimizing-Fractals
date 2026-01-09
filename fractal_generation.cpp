@@ -168,37 +168,37 @@ extern "C" {
         generateBoolFractal(boolArray, coeffs, 30, pixels);
 
 
-        // Find 'coolness'
-        int count = 0;
+        // Find apporximate surface area and volume
+        int surfaceCount = 0;
 
         for (int row = 0; row < pixels-1; row++) {
 
             for (int col = 0; col < pixels-1; col++) {
                 
                 if (boolArray[row*pixels + col] != boolArray[row*pixels+col+1]) {
-                    count++;
+                    surfaceCount++;
                 }
 
                 if (boolArray[row*pixels + col] != boolArray[(row+1)*pixels+col]) {
-                    count++;
+                    surfaceCount++;
                 }
                 
             }
 
             if (boolArray[row*pixels + (pixels - 1)] != boolArray[(row+1)*pixels + (pixels - 1)]) {
-                count++;
+                surfaceCount++;
             }
         }
 
         for (int col = 0; col < pixels-1; col++) {
                 
             if (boolArray[(pixels-1)*pixels + col] != boolArray[(pixels-1)*pixels+col+1]) {
-                count++;
+                surfaceCount++;
             }
                 
         }
 
-        return count;
+        return surfaceCount;
 
     }
 
@@ -394,12 +394,12 @@ extern "C" {
 
                     coeffs[0][2][0]*z*z + coeffs[1][2][0]*c*z*z + coeffs[2][2][0]*c*c*z*z +
                     coeffs[0][0][2]*zb*zb + coeffs[1][0][2]*c*zb*zb + coeffs[2][0][2]*c*c*zb*zb +
-                    coeffs[0][1][1]*z*zb  + coeffs[1][1][1]*c*z*zb + coeffs[2][1][1]*c*c*z*zb +
+                    coeffs[0][1][1]*norm  + coeffs[1][1][1]*c*norm + coeffs[2][1][1]*c*c*norm +
 
-                    coeffs[0][2][1]*z*z*zb  + coeffs[1][2][1]*c*z*z*zb + coeffs[2][2][1]*c*c*z*z*zb +
-                    coeffs[0][1][2]*z*zb*zb  + coeffs[1][1][2]*c*z*zb*zb + coeffs[2][1][2]*c*c*z*zb*zb +
+                    coeffs[0][2][1]*z*norm  + coeffs[1][2][1]*c*z*norm + coeffs[2][2][1]*c*c*z*norm +
+                    coeffs[0][1][2]*norm*zb  + coeffs[1][1][2]*c*norm*zb + coeffs[2][1][2]*c*c*norm*zb +
 
-                    coeffs[0][2][2]*z*z*zb*zb  + coeffs[1][2][2]*c*z*z*zb*zb + coeffs[2][2][2]*c*c*z*z*zb*zb;
+                    coeffs[0][2][2]*norm*norm  + coeffs[1][2][2]*c*norm*norm + coeffs[2][2][2]*c*c*norm*norm;
 
                     // Find conjugate and norm of z
                     zb = std::conj(z);
@@ -450,7 +450,6 @@ extern "C" {
         return 4;
 
     }
-
 
 }
 
