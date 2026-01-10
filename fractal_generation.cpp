@@ -151,8 +151,9 @@ extern "C" {
 
     // Generates a simplefractal with the input parameters using generateBoolFractal
     // Then find how 'cool' the result is and returns that
+    // This iteration uses (surface area / volume) * custom sigmoid function(volume)
     __declspec(dllexport)
-    int coolness(float* parameters, int pixels) {
+    float coolness(float* parameters, int pixels) {
 
         // Create array to be filled with fractal data
         std::vector<bool> boolArray(pixels*pixels);
@@ -161,14 +162,17 @@ extern "C" {
         std::complex<float> coeffs[3][3][3];
 
         for (int i = 0; i < 27; i++) {
-            coeffs[i%3][(i%9)/3][i/9] = std::complex<float>(parameters[i],parameters[i+1]);
+            coeffs[i%3][(i%9)/3][i/9] = std::complex<float>(parameters[2*i],parameters[2*i+1]);
         }
 
         // Call generateBoolFractal
         generateBoolFractal(boolArray, coeffs, 30, pixels);
 
 
-        // Find apporximate surface area and volume
+        // Find 'coolness' and size of fractal
+
+        int sizeCount = 0;
+
         int surfaceCount = 0;
 
         for (int row = 0; row < pixels-1; row++) {
@@ -182,12 +186,20 @@ extern "C" {
                 if (boolArray[row*pixels + col] != boolArray[(row+1)*pixels+col]) {
                     surfaceCount++;
                 }
-                
+
+                if (boolArray[row*pixels + col]) {
+                    sizeCount++;
+                }
             }
 
             if (boolArray[row*pixels + (pixels - 1)] != boolArray[(row+1)*pixels + (pixels - 1)]) {
                 surfaceCount++;
             }
+
+            if (boolArray[row*pixels + (pixels - 1)]) {
+                sizeCount++;
+            }
+
         }
 
         for (int col = 0; col < pixels-1; col++) {
@@ -195,11 +207,32 @@ extern "C" {
             if (boolArray[(pixels-1)*pixels + col] != boolArray[(pixels-1)*pixels+col+1]) {
                 surfaceCount++;
             }
+
+            if (boolArray[(pixels-1)*pixels + col]) {
+                sizeCount++;
+            }
                 
         }
 
-        return surfaceCount;
+        // TEST print statement std::cout << "Surface: " << surfaceCount << " Volume: " << sizeCount << std::endl;
 
+
+        if (sizeCount == 0) {
+            return 0;
+        }
+        else {
+
+            // Parameters of first sigmoid, responsible for keeping size around 40% of total area
+            float a = 4.39445;
+            float b = .4 * pixels * pixels / a;
+
+            // Parameters of second sigmoid, responible for stopping extremely small areas
+            float a2 = 4.595;
+            float b2 = pixels * pixels / 45.951;
+
+            // TEST std::cout << "UGH:  " << (1.0 * surfaceCount) / (sizeCount * (1.0 + std::exp(a - (sizeCount / b))) * (1.0  + std::exp(a2 - (sizeCount / b2)))) << std::endl;
+            return (1.0 * surfaceCount) / (sizeCount * (1.0 + std::exp(a - (sizeCount / b))) * (1.0  + std::exp(a2 - (sizeCount / b2))));
+        }
     }
 
     // Tests generateBoolFractal on the mandelbrot set, doesn't actually run tests it just returns a ton of info about what was generated

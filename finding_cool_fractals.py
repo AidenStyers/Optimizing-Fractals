@@ -14,7 +14,7 @@ fractal_generation_functions.coolness.argtypes = [
     ndpointer(dtype=np.float32, flags="C_CONTIGUOUS"),
     c_int
 ]
-fractal_generation_functions.coolness.restype = int
+fractal_generation_functions.coolness.restype = c_float
 
 
 fractal_generation_functions.formattedGreyscaleFractal.argtypes = [
@@ -42,7 +42,7 @@ try:
 
         print(rounds)
 
-        for i in range(100):
+        for i in range(10):
 
             # Generate coefficients
             cReal = np.random.uniform(-2.0,2.0)
@@ -59,7 +59,7 @@ try:
             parameters[18] = zbReal
             parameters[19] = zbImag
 
-            fractalResults = fractal_generation_functions.coolness(np.array(parameters, dtype=c_float), 512)
+            fractalResults = fractal_generation_functions.coolness(np.array(parameters, dtype=c_float), 1024)
 
             bufferDF.loc[i] = [cReal, cImag, zbReal, zbImag, zsReal, zsImag, fractalResults]
 

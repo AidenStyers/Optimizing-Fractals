@@ -6,3 +6,4 @@ lodepng.obj
 build/**
 testCPlus.cpp
 testcallingC.py
+fractaldata.duckdb
