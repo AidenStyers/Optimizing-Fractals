@@ -158,3 +158,69 @@ int slow_fractal(
     }
 }
 
+
+
+int boolean_fractal(
+    float cx, // X position of center 
+    float cy, // Y position of center
+    float scale, // Scale of fractal, how wide/long each pixel of the resulting image is in the complex plane
+    int width, // Width of resulting image 
+    int height, // Height of resulting image
+    int max_iter, // Maximum number of iterations
+    unsigned char* output,
+    float* coeffs
+) {
+    try {
+        static OpenCLContext ctx;
+        static bool initialized = false;
+
+        if (!initialized) {
+            ctx = init_opencl(all_kernel_sources, num_kernel_sources);
+            initialized = true;
+        }
+
+        // Create buffer to handle output
+        size_t buffer_size = width * height;
+        cl_mem out_buf = clCreateBuffer(
+            ctx.context, CL_MEM_WRITE_ONLY,
+            buffer_size, nullptr, nullptr
+        );
+
+        // Create buffer to handle coeffs
+        cl_mem coeffs_buf = clCreateBuffer(
+            ctx.context,
+            CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+            sizeof(float) * 52, // Amount of parameters
+            coeffs,
+            nullptr
+        );
+
+        cl_kernel kernel = ctx.standard_fractal_kernel;
+
+        CL_CHECK(clSetKernelArg(kernel, 0, sizeof(float), &cx));
+        CL_CHECK(clSetKernelArg(kernel, 1, sizeof(float), &cy));
+        CL_CHECK(clSetKernelArg(kernel, 2, sizeof(float), &scale));
+        CL_CHECK(clSetKernelArg(kernel, 3, sizeof(int), &width));
+        CL_CHECK(clSetKernelArg(kernel, 4, sizeof(int), &height));
+        CL_CHECK(clSetKernelArg(kernel, 5, sizeof(int), &max_iter));
+        CL_CHECK(clSetKernelArg(kernel, 6, sizeof(cl_mem), &out_buf));
+        CL_CHECK(clSetKernelArg(kernel, 7, sizeof(cl_mem), &coeffs_buf));
+
+        size_t global[2] = { (size_t)width, (size_t)height };
+        CL_CHECK(clEnqueueNDRangeKernel(ctx.queue, kernel, 2, nullptr, global, nullptr, 0, nullptr, nullptr));
+
+        CL_CHECK(clEnqueueReadBuffer(
+            ctx.queue, out_buf, CL_TRUE, 0,
+            buffer_size, output, 0, nullptr, nullptr
+        ));
+
+        CL_CHECK(clReleaseMemObject(coeffs_buf));
+        CL_CHECK(clReleaseMemObject(out_buf));
+
+        return 0;
+    }
+    catch (const std::exception& e) {
+        last_error = e.what();
+        return -1;
+    }
+}

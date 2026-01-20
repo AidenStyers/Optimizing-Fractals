@@ -52,7 +52,11 @@ OpenCLContext init_opencl(const char** kernel_sources, size_t num_kernel_sources
     // Add a line here for each kernel
     ctx.standard_fractal_kernel = clCreateKernel(ctx.program, "standard_fractal", &err);
     CL_CHECK(err);
+    
     ctx.slow_fractal_kernel = clCreateKernel(ctx.program, "slow_fractal", &err);
+    CL_CHECK(err);
+
+    ctx.boolean_fractal_kernel = clCreateKernel(ctx.program, "boolean_fractal", &err);
     CL_CHECK(err);
 
     return ctx;

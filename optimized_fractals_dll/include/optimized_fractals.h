@@ -35,6 +35,16 @@ DLL_EXPORT int slow_fractal(
     float* coeffs
 );
 
+DLL_EXPORT int boolean_fractal(
+    float center_x,
+    float center_y,
+    float scale,
+    int width,
+    int height,
+    int max_iter,
+    unsigned char* output,
+    float* coeffs
+);
 
 
 #ifdef __cplusplus

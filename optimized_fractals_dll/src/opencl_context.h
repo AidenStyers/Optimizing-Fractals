@@ -10,6 +10,7 @@ struct OpenCLContext {
     // Each kernel should get its own line here
     cl_kernel standard_fractal_kernel;
     cl_kernel slow_fractal_kernel;
+    cl_kernel boolean_fractal_kernel;
 
     cl_device_id device;
 };
