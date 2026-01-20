@@ -32,7 +32,7 @@ int standard_fractal(
         static bool initialized = false;
 
         if (!initialized) {
-            ctx = init_opencl(kernel_source);
+            ctx = init_opencl(all_kernel_sources, num_kernel_sources);
             initialized = true;
         }
 
@@ -69,7 +69,7 @@ int standard_fractal(
         CL_CHECK(clSetKernelArg(kernel, 3, sizeof(int), &width));
         CL_CHECK(clSetKernelArg(kernel, 4, sizeof(int), &height));
         CL_CHECK(clSetKernelArg(kernel, 5, sizeof(int), &max_iter));
-        CL_CHECK(clSetKernelArg(kernel, 6, sizeof(int), &color_palette_buf));
+        CL_CHECK(clSetKernelArg(kernel, 6, sizeof(cl_mem), &color_palette_buf));
         CL_CHECK(clSetKernelArg(kernel, 7, sizeof(cl_mem), &out_buf));
         CL_CHECK(clSetKernelArg(kernel, 8, sizeof(cl_mem), &coeffs_buf));
 
@@ -108,7 +108,7 @@ int slow_fractal(
         static bool initialized = false;
 
         if (!initialized) {
-            ctx = init_opencl(kernel_source);
+            ctx = init_opencl(all_kernel_sources, num_kernel_sources);
             initialized = true;
         }
 

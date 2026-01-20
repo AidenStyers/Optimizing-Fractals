@@ -19,7 +19,6 @@ DLL_EXPORT int standard_fractal(
     int width,
     int height,
     int max_iter,
-    int color_code,
     int* color_palette,
     unsigned char* output,
     float* coeffs

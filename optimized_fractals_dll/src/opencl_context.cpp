@@ -3,7 +3,10 @@
 #include <stdexcept>
 #include "opencl_check.h"
 
-OpenCLContext init_opencl(const char* kernel_source) {
+OpenCLContext init_opencl(const char** kernel_sources, size_t num_kernel_sources) {
+
+    cl_int err = CL_SUCCESS; // Stores error messages
+
     OpenCLContext ctx{};
 
     cl_platform_id platform;
@@ -11,15 +14,17 @@ OpenCLContext init_opencl(const char* kernel_source) {
 
     CL_CHECK(clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 1, &ctx.device, nullptr));
 
-    ctx.context = clCreateContext(nullptr, 1, &ctx.device, nullptr, nullptr, nullptr);
-    ctx.queue = clCreateCommandQueue(ctx.context, ctx.device, 0, nullptr);
+    ctx.context = clCreateContext(nullptr, 1, &ctx.device, nullptr, nullptr, &err);
+    CL_CHECK(err);
 
-    size_t src_len = strlen(kernel_source);
+    ctx.queue = clCreateCommandQueue(ctx.context, ctx.device, 0, &err);
+    CL_CHECK(err);
+
     ctx.program = clCreateProgramWithSource(
-        ctx.context, 1, &kernel_source, &src_len, nullptr
+        ctx.context, num_kernel_sources, kernel_sources, nullptr, &err
     );
 
-    cl_int err = clBuildProgram(ctx.program, 1, &ctx.device, nullptr, nullptr, nullptr);
+    err = clBuildProgram(ctx.program, 1, &ctx.device, nullptr, nullptr, nullptr);
 
     if (err != CL_SUCCESS) {
         size_t log_size = 0;
@@ -45,8 +50,10 @@ OpenCLContext init_opencl(const char* kernel_source) {
     }
 
     // Add a line here for each kernel
-    ctx.standard_fractal_kernel = clCreateKernel(ctx.program, "standard_fractal", nullptr);
-    ctx.slow_fractal_kernel = clCreateKernel(ctx.program, "slow_fractal", nullptr);
+    ctx.standard_fractal_kernel = clCreateKernel(ctx.program, "standard_fractal", &err);
+    CL_CHECK(err);
+    ctx.slow_fractal_kernel = clCreateKernel(ctx.program, "slow_fractal", &err);
+    CL_CHECK(err);
 
     return ctx;
 }

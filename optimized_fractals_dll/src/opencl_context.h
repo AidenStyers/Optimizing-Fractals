@@ -14,5 +14,5 @@ struct OpenCLContext {
     cl_device_id device;
 };
 
-OpenCLContext init_opencl(const char* kernel_source);
+OpenCLContext init_opencl(const char** kernel_sources, size_t num_kernel_sources);
 void cleanup_opencl(OpenCLContext& ctx);
