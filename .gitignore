@@ -7,3 +7,4 @@ build/**
 testCPlus.cpp
 testcallingC.py
 fractaldata.duckdb
+optimized_fractals_dll/build/**

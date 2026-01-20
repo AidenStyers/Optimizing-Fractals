@@ -46,12 +46,29 @@ std::complex<float> normal_calc(float zr, float zi, float cr, float ci, float co
 // Optimal code
 std::complex<float> optimal_calc(float zr, float zi, float cr, float ci, float coeffs[]) {
 
-    float p0 = cr*cr + -1*ci*ci;
-    float p1 = ci*cr;
-    float p2 = 2*cr*cr + -2*ci*ci;
+    float p0 = coeffs[0]*cr + -1*ci*coeffs[1] + coeffs[2]*cr*cr + -2*ci*coeffs[3]*cr + -1*ci*ci*coeffs[2];
+    float p1 = coeffs[16] + coeffs[4] + coeffs[18]*cr + -1*ci*coeffs[19] + coeffs[6]*cr + -1*ci*coeffs[7] + coeffs[20]*cr*cr + -2*ci*coeffs[21]*cr + -1*ci*ci*coeffs[20] + coeffs[8]*cr*cr + -2*ci*coeffs[9]*cr + -1*ci*ci*coeffs[8];
+    float p2 = coeffs[34] + coeffs[22] + coeffs[10] + coeffs[36]*cr + -1*ci*coeffs[37] + coeffs[24]*cr + -1*ci*coeffs[25] + coeffs[12]*cr + -1*ci*coeffs[13] + coeffs[38]*cr*cr + -2*ci*coeffs[39]*cr + -1*ci*ci*coeffs[38] + coeffs[26]*cr*cr + -2*ci*coeffs[27]*cr + -1*ci*ci*coeffs[26] + coeffs[14]*cr*cr + -2*ci*coeffs[15]*cr + -1*ci*ci*coeffs[14];
+    float p3 = coeffs[40] + coeffs[28] + coeffs[42]*cr + -1*ci*coeffs[43] + coeffs[30]*cr + -1*ci*coeffs[31] + coeffs[44]*cr*cr + -2*ci*coeffs[45]*cr + -1*ci*ci*coeffs[44] + coeffs[32]*cr*cr + -2*ci*coeffs[33]*cr + -1*ci*ci*coeffs[32];
+    float p4 = coeffs[46] + coeffs[48]*cr + -1*ci*coeffs[49] + coeffs[50]*cr*cr + -2*ci*coeffs[51]*cr + -1*ci*ci*coeffs[50];
+    float p5 = coeffs[17] + -1*coeffs[5] + coeffs[19]*cr + ci*coeffs[18] + -1*coeffs[7]*cr + -1*ci*coeffs[6] + coeffs[21]*cr*cr + 2*ci*coeffs[20]*cr + -1*ci*ci*coeffs[21] + -1*coeffs[9]*cr*cr + -2*ci*coeffs[8]*cr + ci*ci*coeffs[9];
+    float p6 = 2*coeffs[35] + -2*coeffs[11] + 2*coeffs[37]*cr + 2*ci*coeffs[36] + -2*coeffs[13]*cr + -2*ci*coeffs[12] + 2*coeffs[39]*cr*cr + 4*ci*coeffs[38]*cr + -2*ci*ci*coeffs[39] + -2*coeffs[15]*cr*cr + -4*ci*coeffs[14]*cr + 2*ci*ci*coeffs[15];
+    float p7 = coeffs[41] + -1*coeffs[29] + coeffs[43]*cr + ci*coeffs[42] + -1*coeffs[31]*cr + -1*ci*coeffs[30] + coeffs[45]*cr*cr + 2*ci*coeffs[44]*cr + -1*ci*ci*coeffs[45] + -1*coeffs[33]*cr*cr + -2*ci*coeffs[32]*cr + ci*ci*coeffs[33];
+    float p8 = -1*coeffs[34] + coeffs[22] + -1*coeffs[10] + -1*coeffs[36]*cr + ci*coeffs[37] + coeffs[24]*cr + -1*ci*coeffs[25] + -1*coeffs[12]*cr + ci*coeffs[13] + -1*coeffs[38]*cr*cr + 2*ci*coeffs[39]*cr + ci*ci*coeffs[38] + coeffs[26]*cr*cr + -2*ci*coeffs[27]*cr + -1*ci*ci*coeffs[26] + -1*coeffs[14]*cr*cr + 2*ci*coeffs[15]*cr + ci*ci*coeffs[14];
+    float p9 = 2*coeffs[46] + 2*coeffs[48]*cr + -2*ci*coeffs[49] + 2*coeffs[50]*cr*cr + -4*ci*coeffs[51]*cr + -2*ci*ci*coeffs[50];
+    float p10 = coeffs[1]*cr + ci*coeffs[0] + coeffs[3]*cr*cr + 2*ci*coeffs[2]*cr + -1*ci*ci*coeffs[3];
+    float p11 = coeffs[17] + coeffs[5] + coeffs[19]*cr + ci*coeffs[18] + coeffs[7]*cr + ci*coeffs[6] + coeffs[21]*cr*cr + 2*ci*coeffs[20]*cr + -1*ci*ci*coeffs[21] + coeffs[9]*cr*cr + 2*ci*coeffs[8]*cr + -1*ci*ci*coeffs[9];
+    float p12 = coeffs[35] + coeffs[23] + coeffs[11] + coeffs[37]*cr + ci*coeffs[36] + coeffs[25]*cr + ci*coeffs[24] + coeffs[13]*cr + ci*coeffs[12] + coeffs[39]*cr*cr + 2*ci*coeffs[38]*cr + -1*ci*ci*coeffs[39] + coeffs[27]*cr*cr + 2*ci*coeffs[26]*cr + -1*ci*ci*coeffs[27] + coeffs[15]*cr*cr + 2*ci*coeffs[14]*cr + -1*ci*ci*coeffs[15];
+    float p13 = coeffs[41] + coeffs[29] + coeffs[43]*cr + ci*coeffs[42] + coeffs[31]*cr + ci*coeffs[30] + coeffs[45]*cr*cr + 2*ci*coeffs[44]*cr + -1*ci*ci*coeffs[45] + coeffs[33]*cr*cr + 2*ci*coeffs[32]*cr + -1*ci*ci*coeffs[33];
+    float p14 = coeffs[47] + coeffs[49]*cr + ci*coeffs[48] + coeffs[51]*cr*cr + 2*ci*coeffs[50]*cr + -1*ci*ci*coeffs[51];
+    float p15 = -1*coeffs[16] + coeffs[4] + -1*coeffs[18]*cr + ci*coeffs[19] + coeffs[6]*cr + -1*ci*coeffs[7] + -1*coeffs[20]*cr*cr + 2*ci*coeffs[21]*cr + ci*ci*coeffs[20] + coeffs[8]*cr*cr + -2*ci*coeffs[9]*cr + -1*ci*ci*coeffs[8];
+    float p16 = -2*coeffs[34] + 2*coeffs[10] + -2*coeffs[36]*cr + 2*ci*coeffs[37] + 2*coeffs[12]*cr + -2*ci*coeffs[13] + -2*coeffs[38]*cr*cr + 4*ci*coeffs[39]*cr + 2*ci*ci*coeffs[38] + 2*coeffs[14]*cr*cr + -4*ci*coeffs[15]*cr + -2*ci*ci*coeffs[14];
+    float p17 = -1*coeffs[40] + coeffs[28] + -1*coeffs[42]*cr + ci*coeffs[43] + coeffs[30]*cr + -1*ci*coeffs[31] + -1*coeffs[44]*cr*cr + 2*ci*coeffs[45]*cr + ci*ci*coeffs[44] + coeffs[32]*cr*cr + -2*ci*coeffs[33]*cr + -1*ci*ci*coeffs[32];
+    float p18 = -1*coeffs[35] + coeffs[23] + -1*coeffs[11] + -1*coeffs[37]*cr + -1*ci*coeffs[36] + coeffs[25]*cr + ci*coeffs[24] + -1*coeffs[13]*cr + -1*ci*coeffs[12] + -1*coeffs[39]*cr*cr + -2*ci*coeffs[38]*cr + ci*ci*coeffs[39] + coeffs[27]*cr*cr + 2*ci*coeffs[26]*cr + -1*ci*ci*coeffs[27] + -1*coeffs[15]*cr*cr + -2*ci*coeffs[14]*cr + ci*ci*coeffs[15];
+    float p19 = 2*coeffs[47] + 2*coeffs[49]*cr + 2*ci*coeffs[48] + 2*coeffs[51]*cr*cr + 4*ci*coeffs[50]*cr + -2*ci*ci*coeffs[51];
 
-    float real_out = coeffs[0]*cr + (p0) * coeffs[1] + (ci*coeffs[9] + -1*ci*coeffs[3] + p1*2*coeffs[10] + p1*-2*coeffs[4] + (-1*coeffs[17] + coeffs[11] + -1*coeffs[5] + -1*coeffs[18]*cr + coeffs[12]*cr + -1*coeffs[6]*cr - (p0) * coeffs[7] - (p0) * coeffs[19] + (p0) * coeffs[13] + (ci*coeffs[21] + -1*ci*coeffs[15] + p1*2*coeffs[22] + p1*-2*coeffs[16] + (coeffs[23] + coeffs[24]*cr + (p0) * coeffs[25]) * zi) * zi) * zi) * zi + (coeffs[8] + coeffs[2] + coeffs[9]*cr + coeffs[3]*cr + (p0) * coeffs[4] + (p0) * coeffs[10] + (2*ci*coeffs[18] + -2*ci*coeffs[6] + p1*4*coeffs[19] + p1*-4*coeffs[7] + (coeffs[20] + coeffs[14] + coeffs[21]*cr + coeffs[15]*cr + (p0) * coeffs[16] + (p0) * coeffs[22]) * zi) * zi + (coeffs[17] + coeffs[11] + coeffs[5] + coeffs[18]*cr + coeffs[12]*cr + coeffs[6]*cr + (p0) * coeffs[7] + (p0) * coeffs[19] + (p0) * coeffs[13] + (ci*coeffs[21] + -1*ci*coeffs[15] + p1*2*coeffs[22] + p1*-2*coeffs[16] + (2*coeffs[23] + 2*coeffs[24]*cr + (p2) * coeffs[25]) * zi) * zi + (coeffs[20] + coeffs[14] + coeffs[21]*cr + coeffs[15]*cr + (p0) * coeffs[16] + (p0) * coeffs[22] + (coeffs[23] + coeffs[24]*cr + (p0) * coeffs[25]) * zr) * zr) * zr) * zr;
-    float imag_out = ci*coeffs[0] + p1*2*coeffs[1] + (ci*coeffs[9] + ci*coeffs[3] + p1*2*coeffs[10] + p1*2*coeffs[4] + (ci*coeffs[18] + ci*coeffs[12] + ci*coeffs[6] + p1*2*coeffs[19] + p1*2*coeffs[13] + p1*2*coeffs[7] + (ci*coeffs[21] + ci*coeffs[15] + p1*2*coeffs[22] + p1*2*coeffs[16] + (ci*coeffs[24] + p1*2*coeffs[25]) * zr) * zr) * zr) * zr + (-1*coeffs[8] + coeffs[2] + -1*coeffs[9]*cr + coeffs[3]*cr + (p0) * coeffs[4] - (p0) * coeffs[10] + (-2*coeffs[17] + 2*coeffs[5] + -2*coeffs[18]*cr + 2*coeffs[6]*cr + (p2) * coeffs[7] - (p2) * coeffs[19] + (-1*coeffs[20] + coeffs[14] + -1*coeffs[21]*cr + coeffs[15]*cr + (p0) * coeffs[16] - (p0) * coeffs[22]) * zr) * zr + (-1*ci*coeffs[18] + ci*coeffs[12] + -1*ci*coeffs[6] + p1*-2*coeffs[19] + p1*2*coeffs[13] + p1*-2*coeffs[7] + (ci*coeffs[21] + ci*coeffs[15] + p1*2*coeffs[22] + p1*2*coeffs[16] + (2*ci*coeffs[24] + p1*4*coeffs[25]) * zr) * zr + (-1*coeffs[20] + coeffs[14] + -1*coeffs[21]*cr + coeffs[15]*cr + (p0) * coeffs[16] + (ci*coeffs[24] + p1*2*coeffs[25]) * zi - (p0) * coeffs[22]) * zi) * zi) * zi;
+    float real_out = p0 + (p1 + (p2 + (p3 + (p4) * zr) * zr) * zr) * zr + (p5 + (p6 + (p7) * zr) * zr + (p8 + (p3 + (p9) * zr) * zr + (p7 + (p4) * zi) * zi) * zi) * zi;
+    float imag_out = p10 + (p11 + (p12 + (p13 + (p14) * zr) * zr) * zr) * zr + (p15 + (p16 + (p17) * zr) * zr + (p18 + (p13 + (p19) * zr) * zr + (p17 + (p14) * zi) * zi) * zi) * zi;
     return std::complex(real_out, imag_out);
 
 } 
@@ -82,14 +99,24 @@ int main() {
     std::cout << "Normal: " << normal_calc(zr, zi, cr, ci, coeffs) << std::endl;
 
     // Calculate crazy style
-    std::cout << "Optimal: " << normal_calc(zr, zi, cr, ci, coeffs) << std::endl;
+    std::cout << "Optimal: " << optimal_calc(zr, zi, cr, ci, coeffs) << std::endl;
 
-    for (int i = 0; i<52; i++) {
-        coeffs[i] = 1.0f;
+    for (int i = 0; i<26; i++) {
+        coeffs[2*i] = 1.0f;
+        coeffs[2*i+1] = 0.0f;
     }
 
     // Test on all 1's
-    std::cout << "Normal Test: " << normal_calc(1.0f, 1.0f, 1.0f, 1.0f, coeffs) << std::endl;
-    std::cout << "Optimal Test: " << normal_calc(1.0f, 1.0f, 1.0f, 1.0f, coeffs) << std::endl;
+    std::cout << "Normal Test: " << normal_calc(1.0f, 0.0f, 1.0f, 0.0f, coeffs) << std::endl;
+    std::cout << "Optimal Test: " << optimal_calc(1.0f, 0.0f, 1.0f, 0.0f, coeffs) << std::endl;
 
+    for (int i = 0; i<52; i++) {
+        coeffs[i] = 0.0f;
+    }
+
+    coeffs[0] = 1.0f;
+    coeffs[10] = 1.0f;
+
+    std::cout << "Mandelbrot testing:" << std::endl;
+    std::cout << "Mandelbrot testing:" << std::endl;
 }
