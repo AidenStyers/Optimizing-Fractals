@@ -3,6 +3,7 @@
 #include "kernel_source.h"
 #include "opencl_check.h"
 #include <fstream>
+#include <iostream>
 #include <vector>
 #include <string>
 
@@ -195,7 +196,7 @@ int boolean_fractal(
             nullptr
         );
 
-        cl_kernel kernel = ctx.standard_fractal_kernel;
+        cl_kernel kernel = ctx.boolean_fractal_kernel;
 
         CL_CHECK(clSetKernelArg(kernel, 0, sizeof(float), &cx));
         CL_CHECK(clSetKernelArg(kernel, 1, sizeof(float), &cy));
@@ -216,6 +217,97 @@ int boolean_fractal(
 
         CL_CHECK(clReleaseMemObject(coeffs_buf));
         CL_CHECK(clReleaseMemObject(out_buf));
+
+        return 0;
+    }
+    catch (const std::exception& e) {
+        last_error = e.what();
+        return -1;
+    }
+}
+
+
+
+int coolness_raw(
+    float cx, // X position of center 
+    float cy, // Y position of center
+    float scale, // Scale of fractal, how wide/long each pixel of the resulting image is in the complex plane
+    int width, // Width of resulting image 
+    int height, // Height of resulting image
+    int max_iter, // Maximum number of iterations
+    float* coeffs, // Coefficients to calculate fractal
+    int* surface_area_out,
+    int* size_out 
+) {
+    try {
+        
+        unsigned char* bool_fractal = new unsigned char[width*height];
+
+        // Generate the fractal
+        boolean_fractal(
+            cx,  
+            cy, 
+            scale, 
+            width, 
+            height,
+            max_iter,
+            bool_fractal,
+            coeffs
+        );
+
+        int surface_area = 0;
+        int size = 0;
+        int index;
+        int rowIndex = 0;
+
+        // Iterate through each pixel in bool_fractal
+        // If it doesn't match the pixel below it or to the right then add one to surface area
+
+        for (int row = 0; row<height-1; row++) {            // Exclude bottommost row
+            
+            for (int col = 0; col<width-1; col++) {         // Exclude rightmost column
+
+                // Find index of current pixel
+                index = col + rowIndex;
+
+                // Check for different than right/below
+                if (bool_fractal[index] != bool_fractal[index + 1]) {surface_area++;}
+                if (bool_fractal[index] != bool_fractal[index+height]) {surface_area++;}
+
+            }
+
+            // Check last pixel in column, only check below
+            if (bool_fractal[width - 1 + rowIndex] != bool_fractal[width - 1 + rowIndex + height]) {surface_area++;}
+
+            // Update rowIndex
+            rowIndex += width;
+        }
+
+        // Check bottom row, only check to the left
+        for (int col = 0; col<width-1; col++) {   
+                // Find index of current pixel
+                index = col + rowIndex;
+
+                // Check for different than right/below
+                if (bool_fractal[index] != bool_fractal[index + 1]) {surface_area++;}
+        }
+
+
+        // Find the total number of colored pixels
+
+        rowIndex = 0;
+
+        for (int row = 0; row<height; row++) {     
+            for (int col = 0; col<width; col++) { 
+                if (bool_fractal[col + rowIndex]) {size++;}
+            }
+            rowIndex += width;
+        }
+
+
+        // Output results
+        *surface_area_out = surface_area;
+        *size_out = size;
 
         return 0;
     }

@@ -60,13 +60,13 @@ __kernel void boolean_fractal(
         iter++;
     }
 
-    int idx = (y * width + x) * 3;
+    int idx = y * width + x;
 
     if (iter == max_iter) {
-        output[idx] = 1;
+        output[idx] = (uchar) 1;
     }
     else {
-        output[idx] = 0;
+        output[idx] = (uchar) 0;
     }
 }
 )CLC";

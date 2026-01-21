@@ -35,7 +35,7 @@ DLL_EXPORT int slow_fractal(
     float* coeffs
 );
 
-DLL_EXPORT int boolean_fractal(
+int boolean_fractal(
     float center_x,
     float center_y,
     float scale,
@@ -44,6 +44,18 @@ DLL_EXPORT int boolean_fractal(
     int max_iter,
     unsigned char* output,
     float* coeffs
+);
+
+DLL_EXPORT int coolness_raw(
+    float cx,
+    float cy,
+    float scale, 
+    int width,
+    int height,
+    int max_iter,
+    float* coeffs,
+    int* surface_area_out,
+    int* size_out
 );
 
 
