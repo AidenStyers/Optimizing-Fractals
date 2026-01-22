@@ -1,0 +1,141 @@
+# Imports functions from optimized_fractals.dll and nicely packages them
+
+import ctypes
+import numpy as np
+from PIL import Image
+
+
+# Get all functions from optimized_fractals.dll
+lib = ctypes.CDLL(r"C:\Users\aiden\Fractals\optimized_fractals_dll\build\Release\optimized_fractals.dll")
+
+# Set up all the argtypes and restypes  
+lib.get_last_error.restype = ctypes.c_char_p
+
+lib.standard_fractal.argtypes = [
+    ctypes.c_float, ctypes.c_float, ctypes.c_float,
+    ctypes.c_int, ctypes.c_int, ctypes.c_int, 
+    ctypes.POINTER(ctypes.c_int),
+    ctypes.POINTER(ctypes.c_ubyte),
+    ctypes.POINTER(ctypes.c_float)
+]
+
+lib.slow_fractal.argtypes = [
+    ctypes.c_float, ctypes.c_float, ctypes.c_float,
+    ctypes.c_int, ctypes.c_int, ctypes.c_int,
+    ctypes.POINTER(ctypes.c_ubyte),
+    ctypes.POINTER(ctypes.c_float)
+]
+
+lib.coolness_raw.argtypes = [
+    ctypes.c_float, ctypes.c_float, ctypes.c_float,
+    ctypes.c_int, ctypes.c_int, ctypes.c_int,
+    ctypes.POINTER(ctypes.c_float),
+    ctypes.POINTER(ctypes.c_int),
+    ctypes.POINTER(ctypes.c_int)
+]
+
+
+def generate_standard_fractal(
+        height, 
+        width,
+        scale,
+        cx, 
+        cy,
+        max_iter,
+        color_palette,
+        coeffs,
+        output_file
+        ):
+
+    coeffArray = ctypes.c_float * 52
+    coeffs_c = coeffArray(*coeffs)
+
+    colorCoeffArray = ctypes.c_int * 12
+    color_palette_c = colorCoeffArray(*color_palette)
+
+    buffer = np.zeros(width * height * 3, dtype=np.uint8)
+
+    err = lib.standard_fractal(
+        cx, 
+        cy, 
+        scale,
+        width, 
+        height, 
+        max_iter,
+        color_palette_c,
+        buffer.ctypes.data_as(ctypes.POINTER(ctypes.c_ubyte)),
+        coeffs_c
+    )
+    if err == -1:
+        print(lib.get_last_error())
+
+    img = Image.frombuffer("RGB", (width, height), buffer, "raw", "RGB", 0, 1)
+    img.save(output_file)
+
+
+def generate_slow_fractal(
+        height, 
+        width,
+        scale,
+        cx, 
+        cy,
+        max_iter,
+        coeffs,
+        output_file
+        ):
+
+    coeffArray = ctypes.c_float * 52
+    coeffs_c = coeffArray(*coeffs)
+
+    buffer = np.zeros(width * height * 3, dtype=np.uint8)
+
+    err = lib.slow_fractal(
+        cx, 
+        cy, 
+        scale,
+        width, 
+        height, 
+        max_iter,
+        buffer.ctypes.data_as(ctypes.POINTER(ctypes.c_ubyte)),
+        coeffs_c
+    )
+    if err == -1:
+        print(lib.get_last_error())
+
+    img = Image.frombuffer("RGB", (width, height), buffer, "raw", "RGB", 0, 1)
+    img.save(output_file)
+
+
+def coolness_raw(
+        height, 
+        width,
+        scale,
+        cx, 
+        cy,
+        max_iter,
+        coeffs
+        ):
+
+    coeffArray = ctypes.c_float * 52
+    coeffs_c = coeffArray(*coeffs)
+
+    surface_area_out = ctypes.c_int(1)
+    size_out = ctypes.c_int(1)
+
+    err = lib.coolness_raw(
+        cx, 
+        cy, 
+        scale,
+        width, 
+        height, 
+        max_iter,
+        coeffs_c,
+        ctypes.byref(surface_area_out),
+        ctypes.byref(size_out)
+    )
+    if err == -1:
+        print(lib.get_last_error())
+
+    return (surface_area_out.value, size_out.value)
+
+    

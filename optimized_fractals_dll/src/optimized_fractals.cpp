@@ -239,9 +239,10 @@ int coolness_raw(
     int* surface_area_out,
     int* size_out 
 ) {
+
+    unsigned char* bool_fractal = new unsigned char[width*height]; 
+
     try {
-        
-        unsigned char* bool_fractal = new unsigned char[width*height];
 
         // Generate the fractal
         boolean_fractal(
@@ -309,10 +310,12 @@ int coolness_raw(
         *surface_area_out = surface_area;
         *size_out = size;
 
+        delete bool_fractal;
         return 0;
     }
     catch (const std::exception& e) {
         last_error = e.what();
+        delete bool_fractal;
         return -1;
     }
 }
