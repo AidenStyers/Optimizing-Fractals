@@ -1,5 +1,6 @@
 # Imports functions from optimized_fractals.dll and nicely packages them
 
+import math
 import ctypes
 import numpy as np
 from PIL import Image
@@ -34,6 +35,12 @@ lib.coolness_raw.argtypes = [
     ctypes.POINTER(ctypes.c_int)
 ]
 
+lib.surface_area.argtypes = [
+    ctypes.c_float, ctypes.c_float, ctypes.c_float,
+    ctypes.c_int, ctypes.c_int, ctypes.c_int,
+    ctypes.POINTER(ctypes.c_float),
+    ctypes.POINTER(ctypes.c_int)
+]
 
 def generate_standard_fractal(
         height, 
@@ -137,5 +144,38 @@ def coolness_raw(
         print(lib.get_last_error())
 
     return (surface_area_out.value, size_out.value)
+
+
+def surface_area(
+        height, 
+        width,
+        scale,
+        cx, 
+        cy,
+        coeffs
+        ):
+    
+    # Calulate max_iter based on iteration_counts.ipynb, go a bit over just to be sure
+    max_iter = int(math.sqrt(height*width)*0.7 + 10)
+
+    coeffArray = ctypes.c_float * 52
+    coeffs_c = coeffArray(*coeffs)
+
+    surface_area_out = ctypes.c_int(1)
+
+    err = lib.surface_area(
+        cx, 
+        cy, 
+        scale,
+        width, 
+        height, 
+        max_iter,
+        coeffs_c,
+        ctypes.byref(surface_area_out)
+    )
+    if err == -1:
+        print(lib.get_last_error())
+
+    return surface_area_out.value
 
     

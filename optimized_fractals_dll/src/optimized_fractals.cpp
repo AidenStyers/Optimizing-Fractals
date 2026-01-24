@@ -319,3 +319,80 @@ int coolness_raw(
         return -1;
     }
 }
+
+
+int surface_area(
+    float cx, // X position of center 
+    float cy, // Y position of center
+    float scale, // Scale of fractal, how wide/long each pixel of the resulting image is in the complex plane
+    int width, // Width of resulting image 
+    int height, // Height of resulting image
+    int max_iter, // Maximum number of iterations
+    float* coeffs, // Coefficients to calculate fractal
+    int* surface_area_out
+) {
+
+    unsigned char* bool_fractal = new unsigned char[width*height]; 
+
+    try {
+
+        // Generate the fractal
+        boolean_fractal(
+            cx,  
+            cy, 
+            scale, 
+            width, 
+            height,
+            max_iter,
+            bool_fractal,
+            coeffs
+        );
+
+        int surface_area = 0;
+        int index;
+        int rowIndex = 0;
+
+        // Iterate through each pixel in bool_fractal
+        // If it doesn't match the pixel below it or to the right then add one to surface area
+
+        for (int row = 0; row<height-1; row++) {            // Exclude bottommost row
+            
+            for (int col = 0; col<width-1; col++) {         // Exclude rightmost column
+
+                // Find index of current pixel
+                index = col + rowIndex;
+
+                // Check for different than right/below
+                if (bool_fractal[index] != bool_fractal[index + 1]) {surface_area++;}
+                if (bool_fractal[index] != bool_fractal[index+height]) {surface_area++;}
+
+            }
+
+            // Check last pixel in column, only check below
+            if (bool_fractal[width - 1 + rowIndex] != bool_fractal[width - 1 + rowIndex + height]) {surface_area++;}
+
+            // Update rowIndex
+            rowIndex += width;
+        }
+
+        // Check bottom row, only check to the left
+        for (int col = 0; col<width-1; col++) {   
+                // Find index of current pixel
+                index = col + rowIndex;
+
+                // Check for different than right/below
+                if (bool_fractal[index] != bool_fractal[index + 1]) {surface_area++;}
+        }
+
+        // Output results
+        *surface_area_out = surface_area;
+
+        delete bool_fractal;
+        return 0;
+    }
+    catch (const std::exception& e) {
+        last_error = e.what();
+        delete bool_fractal;
+        return -1;
+    }
+}

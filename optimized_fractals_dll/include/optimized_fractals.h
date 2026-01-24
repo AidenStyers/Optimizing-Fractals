@@ -59,6 +59,18 @@ DLL_EXPORT int coolness_raw(
 );
 
 
+DLL_EXPORT int surface_area(
+    float cx,  
+    float cy, 
+    float scale, 
+    int width, 
+    int height,
+    int max_iter, 
+    float* coeffs,
+    int* surface_area_out
+);
+
+
 #ifdef __cplusplus
 }
 #endif
