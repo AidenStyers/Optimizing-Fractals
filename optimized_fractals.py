@@ -15,6 +15,8 @@ lib.get_last_error.restype = ctypes.c_char_p
 lib.standard_fractal.argtypes = [
     ctypes.c_float, ctypes.c_float, ctypes.c_float,
     ctypes.c_int, ctypes.c_int, ctypes.c_int, 
+    ctypes.c_int,
+    ctypes.c_int,
     ctypes.POINTER(ctypes.c_int),
     ctypes.POINTER(ctypes.c_ubyte),
     ctypes.POINTER(ctypes.c_float)
@@ -49,6 +51,8 @@ def generate_standard_fractal(
         cx, 
         cy,
         max_iter,
+        bailout_radius,
+        color_density,
         color_palette,
         coeffs,
         output_file
@@ -69,6 +73,8 @@ def generate_standard_fractal(
         width, 
         height, 
         max_iter,
+        bailout_radius,
+        color_density,
         color_palette_c,
         buffer.ctypes.data_as(ctypes.POINTER(ctypes.c_ubyte)),
         coeffs_c
