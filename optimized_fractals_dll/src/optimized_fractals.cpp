@@ -400,3 +400,92 @@ int surface_area(
         return -1;
     }
 }
+
+
+
+
+int standard_julia(
+    float cx, // X position of center 
+    float cy, // Y position of center
+    float scale, // Scale of fractal, how wide/long each pixel of the resulting image is in the complex plane
+    int width, // Width of resulting image 
+    int height, // Height of resulting image
+    int max_iter, // Maximum number of iterations
+    int bailout_radius,
+    int color_density,
+    int* color_palette, // 4x3 array of colors to use for palette, the four rows each are the RGB for a color used
+    unsigned char* output,
+    float cr,
+    float ci,
+    float* coeffs
+) {
+    try {
+        static OpenCLContext ctx;
+        static bool initialized = false;
+
+        if (!initialized) {
+            ctx = init_opencl(all_kernel_sources, num_kernel_sources);
+            initialized = true;
+        }
+
+        // Create buffer to handle output
+        size_t buffer_size = width * height * 3;
+        cl_mem out_buf = clCreateBuffer(
+            ctx.context, CL_MEM_WRITE_ONLY,
+            buffer_size, nullptr, nullptr
+        );
+
+        // Create buffer to handle coeffs
+        cl_mem coeffs_buf = clCreateBuffer(
+            ctx.context,
+            CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+            sizeof(float) * 52, // Amount of parameters
+            coeffs,
+            nullptr
+        );
+
+        // Create buffer to handle color_coeffs
+        cl_mem color_palette_buf = clCreateBuffer(
+            ctx.context,
+            CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+            sizeof(int) * 12, // Amount of parameters
+            color_palette,
+            nullptr
+        );
+
+        cl_kernel kernel = ctx.standard_julia_kernel;
+
+        CL_CHECK(clSetKernelArg(kernel, 0, sizeof(float), &cx));
+        CL_CHECK(clSetKernelArg(kernel, 1, sizeof(float), &cy));
+        CL_CHECK(clSetKernelArg(kernel, 2, sizeof(float), &scale));
+        CL_CHECK(clSetKernelArg(kernel, 3, sizeof(int), &width));
+        CL_CHECK(clSetKernelArg(kernel, 4, sizeof(int), &height));
+        CL_CHECK(clSetKernelArg(kernel, 5, sizeof(int), &max_iter));
+        CL_CHECK(clSetKernelArg(kernel, 6, sizeof(int), &bailout_radius));
+        CL_CHECK(clSetKernelArg(kernel, 7, sizeof(int), &color_density));
+        CL_CHECK(clSetKernelArg(kernel, 8, sizeof(cl_mem), &color_palette_buf));
+        CL_CHECK(clSetKernelArg(kernel, 9, sizeof(cl_mem), &out_buf));
+        CL_CHECK(clSetKernelArg(kernel, 10, sizeof(int), &cr));
+        CL_CHECK(clSetKernelArg(kernel, 11, sizeof(int), &ci));
+        CL_CHECK(clSetKernelArg(kernel, 12, sizeof(cl_mem), &coeffs_buf));
+
+        size_t global[2] = { (size_t)width, (size_t)height };
+        CL_CHECK(clEnqueueNDRangeKernel(ctx.queue, kernel, 2, nullptr, global, nullptr, 0, nullptr, nullptr));
+
+        CL_CHECK(clEnqueueReadBuffer(
+            ctx.queue, out_buf, CL_TRUE, 0,
+            buffer_size, output, 0, nullptr, nullptr
+        ));
+
+        CL_CHECK(clReleaseMemObject(coeffs_buf));
+        CL_CHECK(clReleaseMemObject(color_palette_buf));
+        CL_CHECK(clReleaseMemObject(out_buf));
+
+        return 0;
+    }
+    catch (const std::exception& e) {
+        last_error = e.what();
+        return -1;
+    }
+}
+

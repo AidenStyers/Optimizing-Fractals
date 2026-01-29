@@ -6,7 +6,7 @@ from PyQt6.QtCore import Qt, QPointF, QTimer
 import optimized_fractals as of
 import numpy as np
 import ctypes
-from fractal_parameters import fractal_parameters
+from fractal_parameters import mandelbrot_parameters, best_fractal_parameters
 
 # Get all functions from optimized_fractals.dll
 lib = ctypes.CDLL(r"C:\Users\aiden\Fractals\optimized_fractals_dll\build\Release\optimized_fractals.dll")
@@ -97,8 +97,6 @@ class FractalViewer(QWidget):
         }
         """
 
-        global fractal_parameters
-
         color_palette = [
             51, 51, 255,
             0, 153, 200,
@@ -114,9 +112,9 @@ class FractalViewer(QWidget):
             view["center_y"],
             100*math.floor(1 + math.log(1/view["scale"])),
             100,
-            20,
+            50,
             color_palette,
-            fractal_parameters,
+            best_fractal_parameters,
             "displayed_image.png"
         )
 

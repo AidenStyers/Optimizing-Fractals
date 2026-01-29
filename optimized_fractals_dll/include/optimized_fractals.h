@@ -72,6 +72,21 @@ DLL_EXPORT int surface_area(
     int* surface_area_out
 );
 
+DLL_EXPORT int standard_julia(
+    float cx, // X position of center 
+    float cy, // Y position of center
+    float scale, // Scale of fractal, how wide/long each pixel of the resulting image is in the complex plane
+    int width, // Width of resulting image 
+    int height, // Height of resulting image
+    int max_iter, // Maximum number of iterations
+    int bailout_radius,
+    int color_density,
+    int* color_palette, // 4x3 array of colors to use for palette, the four rows each are the RGB for a color used
+    unsigned char* output,
+    float cr,
+    float ci,
+    float* coeffs
+);
 
 #ifdef __cplusplus
 }

@@ -4,12 +4,14 @@
 #include "kernels/slow_fractal.h"
 #include "kernels/standard_fractal.h"
 #include "kernels/boolean_fractal.h"
+#include "kernels/standard_julia.h"
 
 // Add each .h file in kernels/
 static const char* all_kernel_sources[] = {
     standard_fractal_source,
     slow_fractal_source,
-    boolean_fractal_source
+    boolean_fractal_source,
+    standard_julia_source
 };
 
 static const size_t num_kernel_sources =

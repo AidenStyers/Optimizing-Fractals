@@ -11,6 +11,7 @@ struct OpenCLContext {
     cl_kernel standard_fractal_kernel;
     cl_kernel slow_fractal_kernel;
     cl_kernel boolean_fractal_kernel;
+    cl_kernel standard_julia_kernel;
 
     cl_device_id device;
 };

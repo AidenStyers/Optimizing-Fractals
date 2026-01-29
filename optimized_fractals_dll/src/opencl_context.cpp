@@ -59,6 +59,9 @@ OpenCLContext init_opencl(const char** kernel_sources, size_t num_kernel_sources
     ctx.boolean_fractal_kernel = clCreateKernel(ctx.program, "boolean_fractal", &err);
     CL_CHECK(err);
 
+    ctx.standard_julia_kernel = clCreateKernel(ctx.program, "standard_julia", &err);
+    CL_CHECK(err);
+
     return ctx;
 }
 
@@ -70,6 +73,12 @@ void cleanup_opencl(OpenCLContext& ctx) {
 
     if (ctx.slow_fractal_kernel)
         clReleaseKernel(ctx.slow_fractal_kernel);
+
+    if (ctx.boolean_fractal_kernel)
+        clReleaseKernel(ctx.boolean_fractal_kernel);
+
+    if (ctx.standard_julia_kernel)
+        clReleaseKernel(ctx.standard_julia_kernel);
 
     if (ctx.program)
         clReleaseProgram(ctx.program);

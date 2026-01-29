@@ -1,4 +1,4 @@
-fractal_parameters = [0.3441029018048667,
+best_fractal_parameters = [0.3441029018048667,
  0.5002697426209395,
  -0.6169348665342972,
  -0.38634441780572915,
@@ -50,3 +50,8 @@ fractal_parameters = [0.3441029018048667,
  0.1252410731194393,
  -0.31320694657655596,
  3.234609985534318]
+
+
+mandelbrot_parameters = [0.0]*52
+mandelbrot_parameters[0] = 1.0
+mandelbrot_parameters[10] = 1.0
