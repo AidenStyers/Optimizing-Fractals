@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 
 #ifdef _WIN32
 #define DLL_EXPORT __declspec(dllexport)
@@ -12,6 +13,12 @@ extern "C" {
 
 DLL_EXPORT const char* get_last_error(void);
 
+// struct to pass coloring info into standard_fractal
+typedef struct {
+    int32_t palette[12];
+    int32_t density;
+} coloring_palette;
+
 DLL_EXPORT int standard_fractal(
     float center_x,
     float center_y,
@@ -20,8 +27,7 @@ DLL_EXPORT int standard_fractal(
     int height,
     int max_iter,
     int bailout_radius,
-    int color_density,
-    int* color_palette,
+    coloring_palette* coloring,
     unsigned char* output,
     float* coeffs
 );

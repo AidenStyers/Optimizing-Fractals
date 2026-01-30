@@ -25,12 +25,12 @@ int standard_fractal(
     int height, // Height of resulting image
     int max_iter, // Maximum number of iterations
     int bailout_radius,
-    int color_density,
-    int* color_palette, // 4x3 array of colors to use for palette, the four rows each are the RGB for a color used
+    coloring_palette* coloring, 
     unsigned char* output,
     float* coeffs
 ) {
     try {
+        
         static OpenCLContext ctx;
         static bool initialized = false;
 
@@ -56,11 +56,11 @@ int standard_fractal(
         );
 
         // Create buffer to handle color_coeffs
-        cl_mem color_palette_buf = clCreateBuffer(
+        cl_mem coloring_buf = clCreateBuffer(
             ctx.context,
             CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-            sizeof(int) * 12, // Amount of parameters
-            color_palette,
+            sizeof(coloring_palette), // Amount of parameters
+            coloring,
             nullptr
         );
 
@@ -73,10 +73,9 @@ int standard_fractal(
         CL_CHECK(clSetKernelArg(kernel, 4, sizeof(int), &height));
         CL_CHECK(clSetKernelArg(kernel, 5, sizeof(int), &max_iter));
         CL_CHECK(clSetKernelArg(kernel, 6, sizeof(int), &bailout_radius));
-        CL_CHECK(clSetKernelArg(kernel, 7, sizeof(int), &color_density));
-        CL_CHECK(clSetKernelArg(kernel, 8, sizeof(cl_mem), &color_palette_buf));
-        CL_CHECK(clSetKernelArg(kernel, 9, sizeof(cl_mem), &out_buf));
-        CL_CHECK(clSetKernelArg(kernel, 10, sizeof(cl_mem), &coeffs_buf));
+        CL_CHECK(clSetKernelArg(kernel, 7, sizeof(cl_mem), &coloring_buf));
+        CL_CHECK(clSetKernelArg(kernel, 8, sizeof(cl_mem), &out_buf));
+        CL_CHECK(clSetKernelArg(kernel, 9, sizeof(cl_mem), &coeffs_buf));
 
         size_t global[2] = { (size_t)width, (size_t)height };
         CL_CHECK(clEnqueueNDRangeKernel(ctx.queue, kernel, 2, nullptr, global, nullptr, 0, nullptr, nullptr));
@@ -87,7 +86,7 @@ int standard_fractal(
         ));
 
         CL_CHECK(clReleaseMemObject(coeffs_buf));
-        CL_CHECK(clReleaseMemObject(color_palette_buf));
+        CL_CHECK(clReleaseMemObject(coloring_buf));
         CL_CHECK(clReleaseMemObject(out_buf));
 
         return 0;

@@ -2,6 +2,11 @@
 
 static const char* standard_fractal_source = R"CLC(
 
+typedef struct {
+    int palette[12];
+    int density;
+} coloring_palette;
+
 __kernel void standard_fractal(
     float cx, // X position of center 
     float cy, // Y position of center
@@ -10,8 +15,7 @@ __kernel void standard_fractal(
     int height, // Height of resulting image
     int max_iter, // Maximum number of iterations
     int bailout_radius,
-    int color_density, // How many iterations it takes for colors to loop
-    __constant int* color_palette, // 4x3 array of RGB values to color graph
+    __constant coloring_palette* coloring, // 4x3 array of RGB values to color graph
     __global uchar* output,
     __constant float* coeffs
 ) {
@@ -70,13 +74,13 @@ __kernel void standard_fractal(
 
     // If all of color_coeffs is zero then do boring coloring
     for (int i = 0; i<12; i++) {
-        colorSum += color_palette[i];
+        colorSum += coloring->palette[i];
     }
     
     if (colorSum == 0) {
 
         // Boring coloring
-        float c = (iter % color_density) / ((float)color_density);
+        float c = (iter % coloring->density) / ((float)coloring->density);
         output[idx + 0] = (uchar) (c * 200);
         output[idx + 1] = (uchar) (c * 200);
         output[idx + 2] = (uchar) (c * 200);
@@ -91,30 +95,30 @@ __kernel void standard_fractal(
         }
         else {
 
-            float c = (iter % color_density) / ((float)color_density);
+            float c = (iter % coloring->density) / ((float)coloring->density);
 
             // Color the output based on a cubic spline between the chosen colors
             // We interpolate between each RGB value so that the resulting cubic polynomials have derivative zero at each knot
             // The math here is confusing, but its just a lot of linear algebra done beforehand
             if (c < 0.25f) {
-                output[idx + 0] = (uchar) (color_palette[0] + 48*(color_palette[3] - color_palette[0])*c*c + 128*(color_palette[0] - color_palette[3])*c*c*c);
-                output[idx + 1] = (uchar) (color_palette[1] + 48*(color_palette[4] - color_palette[1])*c*c + 128*(color_palette[1] - color_palette[4])*c*c*c);
-                output[idx + 2] = (uchar) (color_palette[2] + 48*(color_palette[5] - color_palette[2])*c*c + 128*(color_palette[2] - color_palette[5])*c*c*c);
+                output[idx + 0] = (uchar) (coloring->palette[0] + 48*(coloring->palette[3] - coloring->palette[0])*c*c + 128*(coloring->palette[0] - coloring->palette[3])*c*c*c);
+                output[idx + 1] = (uchar) (coloring->palette[1] + 48*(coloring->palette[4] - coloring->palette[1])*c*c + 128*(coloring->palette[1] - coloring->palette[4])*c*c*c);
+                output[idx + 2] = (uchar) (coloring->palette[2] + 48*(coloring->palette[5] - coloring->palette[2])*c*c + 128*(coloring->palette[2] - coloring->palette[5])*c*c*c);
             }
             else if (c < 0.5f) {
-                output[idx + 0] = (uchar) ((5*color_palette[6] - 4*color_palette[3]) + 48*(color_palette[3] - color_palette[6])*c - 144*(color_palette[3] - color_palette[6])*c*c + 128*(color_palette[3] - color_palette[6])*c*c*c);
-                output[idx + 1] = (uchar) ((5*color_palette[7] - 4*color_palette[4]) + 48*(color_palette[4] - color_palette[7])*c - 144*(color_palette[4] - color_palette[7])*c*c + 128*(color_palette[4] - color_palette[7])*c*c*c);
-                output[idx + 2] = (uchar) ((5*color_palette[8] - 4*color_palette[5]) + 48*(color_palette[5] - color_palette[8])*c - 144*(color_palette[5] - color_palette[8])*c*c + 128*(color_palette[5] - color_palette[8])*c*c*c);
+                output[idx + 0] = (uchar) ((5*coloring->palette[6] - 4*coloring->palette[3]) + 48*(coloring->palette[3] - coloring->palette[6])*c - 144*(coloring->palette[3] - coloring->palette[6])*c*c + 128*(coloring->palette[3] - coloring->palette[6])*c*c*c);
+                output[idx + 1] = (uchar) ((5*coloring->palette[7] - 4*coloring->palette[4]) + 48*(coloring->palette[4] - coloring->palette[7])*c - 144*(coloring->palette[4] - coloring->palette[7])*c*c + 128*(coloring->palette[4] - coloring->palette[7])*c*c*c);
+                output[idx + 2] = (uchar) ((5*coloring->palette[8] - 4*coloring->palette[5]) + 48*(coloring->palette[5] - coloring->palette[8])*c - 144*(coloring->palette[5] - coloring->palette[8])*c*c + 128*(coloring->palette[5] - coloring->palette[8])*c*c*c);
             }
             else if (c < 0.75f) {
-                output[idx + 0] = (uchar) ((28*color_palette[9] - 27*color_palette[6]) + 144*(color_palette[6] - color_palette[9])*c - 240*(color_palette[6] - color_palette[9])*c*c + 128*(color_palette[6] - color_palette[9])*c*c*c);
-                output[idx + 1] = (uchar) ((28*color_palette[10] - 27*color_palette[7]) + 144*(color_palette[7] - color_palette[10])*c - 240*(color_palette[7] - color_palette[10])*c*c + 128*(color_palette[7] - color_palette[10])*c*c*c);
-                output[idx + 2] = (uchar) ((28*color_palette[11] - 27*color_palette[8]) + 144*(color_palette[8] - color_palette[11])*c - 240*(color_palette[8] - color_palette[11])*c*c + 128*(color_palette[8] - color_palette[11])*c*c*c); 
+                output[idx + 0] = (uchar) ((28*coloring->palette[9] - 27*coloring->palette[6]) + 144*(coloring->palette[6] - coloring->palette[9])*c - 240*(coloring->palette[6] - coloring->palette[9])*c*c + 128*(coloring->palette[6] - coloring->palette[9])*c*c*c);
+                output[idx + 1] = (uchar) ((28*coloring->palette[10] - 27*coloring->palette[7]) + 144*(coloring->palette[7] - coloring->palette[10])*c - 240*(coloring->palette[7] - coloring->palette[10])*c*c + 128*(coloring->palette[7] - coloring->palette[10])*c*c*c);
+                output[idx + 2] = (uchar) ((28*coloring->palette[11] - 27*coloring->palette[8]) + 144*(coloring->palette[8] - coloring->palette[11])*c - 240*(coloring->palette[8] - coloring->palette[11])*c*c + 128*(coloring->palette[8] - coloring->palette[11])*c*c*c); 
             }
             else {
-                output[idx + 0] = (uchar) ((81*color_palette[0] - 80*color_palette[9]) + 288*(color_palette[9] - color_palette[0])*c - 336*(color_palette[9] - color_palette[0])*c*c + 128*(color_palette[9] - color_palette[0])*c*c*c);
-                output[idx + 1] = (uchar) ((81*color_palette[1] - 80*color_palette[10]) + 288*(color_palette[11] - color_palette[1])*c - 336*(color_palette[10] - color_palette[1])*c*c + 128*(color_palette[10] - color_palette[1])*c*c*c);
-                output[idx + 2] = (uchar) ((81*color_palette[2] - 80*color_palette[11]) + 288*(color_palette[10] - color_palette[2])*c - 336*(color_palette[11] - color_palette[2])*c*c + 128*(color_palette[11] - color_palette[2])*c*c*c);
+                output[idx + 0] = (uchar) ((81*coloring->palette[0] - 80*coloring->palette[9]) + 288*(coloring->palette[9] - coloring->palette[0])*c - 336*(coloring->palette[9] - coloring->palette[0])*c*c + 128*(coloring->palette[9] - coloring->palette[0])*c*c*c);
+                output[idx + 1] = (uchar) ((81*coloring->palette[1] - 80*coloring->palette[10]) + 288*(coloring->palette[11] - coloring->palette[1])*c - 336*(coloring->palette[10] - coloring->palette[1])*c*c + 128*(coloring->palette[10] - coloring->palette[1])*c*c*c);
+                output[idx + 2] = (uchar) ((81*coloring->palette[2] - 80*coloring->palette[11]) + 288*(coloring->palette[10] - coloring->palette[2])*c - 336*(coloring->palette[11] - coloring->palette[2])*c*c + 128*(coloring->palette[11] - coloring->palette[2])*c*c*c);
             }
         }
     }

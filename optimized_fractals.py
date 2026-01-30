@@ -5,19 +5,22 @@ import ctypes
 import numpy as np
 from PIL import Image
 
-
 # Get all functions from optimized_fractals.dll
 lib = ctypes.CDLL(r"C:\Users\aiden\Fractals\optimized_fractals_dll\build\Release\optimized_fractals.dll")
 
 # Set up all the argtypes and restypes  
 lib.get_last_error.restype = ctypes.c_char_p
 
+# Class to pass coloring information into standard_fractal
+class coloring(ctypes.Structure):
+    _fields_ = [("palette", ctypes.c_int32 * 12), ("density", ctypes.c_int32)]
+
+
 lib.standard_fractal.argtypes = [
     ctypes.c_float, ctypes.c_float, ctypes.c_float,
     ctypes.c_int, ctypes.c_int, ctypes.c_int, 
     ctypes.c_int,
-    ctypes.c_int,
-    ctypes.POINTER(ctypes.c_int),
+    ctypes.POINTER(coloring),
     ctypes.POINTER(ctypes.c_ubyte),
     ctypes.POINTER(ctypes.c_float)
 ]
@@ -44,6 +47,19 @@ lib.surface_area.argtypes = [
     ctypes.POINTER(ctypes.c_int)
 ]
 
+lib.standard_julia.argtypes = [
+    ctypes.c_float, ctypes.c_float, ctypes.c_float,
+    ctypes.c_int, ctypes.c_int, ctypes.c_int, 
+    ctypes.c_int,
+    ctypes.c_int,
+    ctypes.POINTER(ctypes.c_int),
+    ctypes.POINTER(ctypes.c_ubyte),
+    ctypes.c_float,
+    ctypes.c_float,
+    ctypes.POINTER(ctypes.c_float)
+]
+
+
 def generate_standard_fractal(
         height, 
         width,
@@ -52,17 +68,13 @@ def generate_standard_fractal(
         cy,
         max_iter,
         bailout_radius,
-        color_density,
-        color_palette,
+        coloring,
         coeffs,
         output_file
         ):
 
     coeffArray = ctypes.c_float * 52
     coeffs_c = coeffArray(*coeffs)
-
-    colorCoeffArray = ctypes.c_int * 12
-    color_palette_c = colorCoeffArray(*color_palette)
 
     buffer = np.zeros(width * height * 3, dtype=np.uint8)
 
@@ -74,8 +86,7 @@ def generate_standard_fractal(
         height, 
         max_iter,
         bailout_radius,
-        color_density,
-        color_palette_c,
+        ctypes.byref(coloring),
         buffer.ctypes.data_as(ctypes.POINTER(ctypes.c_ubyte)),
         coeffs_c
     )
@@ -184,4 +195,49 @@ def surface_area(
 
     return surface_area_out.value
 
+
+def generate_standard_julia(
+        height, 
+        width,
+        scale,
+        cx, 
+        cy,
+        max_iter,
+        bailout_radius,
+        color_density,
+        color_palette,        
+        cr,
+        ci,
+        coeffs,
+        output_file
+        ):
+
+    coeffArray = ctypes.c_float * 52
+    coeffs_c = coeffArray(*coeffs)
+
+    colorCoeffArray = ctypes.c_int * 12
+    color_palette_c = colorCoeffArray(*color_palette)
+
+    buffer = np.zeros(width * height * 3, dtype=np.uint8)
+
+    err = lib.standard_julia(
+        cx, 
+        cy, 
+        scale,
+        width, 
+        height, 
+        max_iter,
+        bailout_radius,
+        color_density,
+        color_palette_c,
+        buffer.ctypes.data_as(ctypes.POINTER(ctypes.c_ubyte)),
+        cr,
+        ci,
+        coeffs_c
+    )
+    if err == -1:
+        print(lib.get_last_error())
+
+    img = Image.frombuffer("RGB", (width, height), buffer, "raw", "RGB", 0, 1)
+    img.save(output_file)
     
