@@ -1,4 +1,6 @@
-*.png
+/*.png
+images/*
 fractaldata.duckdb
 optimized_fractals_dll/build/**
 __pycache__/**
+gif_frames/**

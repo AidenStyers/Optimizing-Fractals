@@ -13,7 +13,7 @@ lib.get_last_error.restype = ctypes.c_char_p
 
 # Class to pass coloring information into standard_fractal
 class coloring(ctypes.Structure):
-    _fields_ = [("palette", ctypes.c_int32 * 12), ("density", ctypes.c_int32)]
+    _fields_ = [("coloring_option", ctypes.c_int32), ("palette", ctypes.c_int32 * 12), ("density", ctypes.c_int32)]
 
 
 lib.standard_fractal.argtypes = [
