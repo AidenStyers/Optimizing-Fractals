@@ -3,6 +3,7 @@
 static const char* standard_fractal_source = R"CLC(
 
 typedef struct {
+    int coloring_option; // 0: no coloring, 1: diverging coloring, 2: internal coloring, 3: both
     int palette[12];
     int density;
 } coloring_palette;
@@ -15,11 +16,11 @@ __kernel void standard_fractal(
     int height, // Height of resulting image
     int max_iter, // Maximum number of iterations
     int bailout_radius,
-    __constant coloring_palette* coloring, // 4x3 array of RGB values to color graph
+    __constant coloring_palette* coloring,
     __global uchar* output,
     __constant float* coeffs
 ) {
-    
+
     // Get the x and y coordinates of the pixel that this kernel is calculating
     int x = get_global_id(0);
     int y = get_global_id(1);
@@ -70,31 +71,45 @@ __kernel void standard_fractal(
 
     int idx = (y * width + x) * 3;
 
-    float colorSum = 0;
+    if (iter >= max_iter) {
 
-    // If all of color_coeffs is zero then do boring coloring
-    for (int i = 0; i<12; i++) {
-        colorSum += coloring->palette[i];
-    }
-    
-    if (colorSum == 0) {
+        if (coloring->coloring_option >= 2) {
+            
+            // Save current values of zr and zi
+            float starting_zr = zr;
+            float starting_zi = zi;
 
-        // Boring coloring
-        float c = (iter % coloring->density) / ((float)coloring->density);
-        output[idx + 0] = (uchar) (c * 200);
-        output[idx + 1] = (uchar) (c * 200);
-        output[idx + 2] = (uchar) (c * 200);
+            // Iterate more until z gets close to it's starting value again or until a max amount of iterations
+            int iter = 0;
+            do {
+                float temp = p0 + (p1 + (p2 + (p3 + (p4) * zr) * zr) * zr) * zr + (p5 + (p6 + (p7) * zr) * zr + (p8 + (p3 + (p9) * zr) * zr + (p7 + (p4) * zi) * zi) * zi) * zi;
+                zi = p10 + (p11 + (p12 + (p13 + (p14) * zr) * zr) * zr) * zr + (p15 + (p16 + (p17) * zr) * zr + (p18 + (p13 + (p19) * zr) * zr + (p17 + (p14) * zi) * zi) * zi) * zi;
+                zr = temp;
+                iter++;
+            } while ((zr-starting_zr)*(zr-starting_zr) + (zi - starting_zi)*(zi - starting_zi) >= 0.00000001f && iter < 100) ;
 
-    } 
-    else {
-
-        if (iter >= max_iter) {
+            // Use sin to generate rainbow of colors
+            iter += 8;
+            output[idx + 0] = (uchar)( native_sin(6.28f * iter / 16)*127 + 128 );
+            output[idx + 1] = (uchar)( native_sin((6.28f * iter / 16) + 2.09f)*127 + 128 );
+            output[idx + 2] = (uchar)( native_sin((6.28f * iter / 16) + 4.18f)*127 + 128 );
+        }
+        else {
             output[idx + 0] = 0;
             output[idx + 1] = 0;
             output[idx + 2] = 0;
         }
-        else {
+        
+    }
+    else {
 
+        if (coloring->coloring_option % 2 == 0) { 
+            // No divergent coloring
+            output[idx + 0] = 255;
+            output[idx + 1] = 255;
+            output[idx + 2] = 255;
+        }
+        else {
             float c = (iter % coloring->density) / ((float)coloring->density);
 
             // Color the output based on a cubic spline between the chosen colors

@@ -30,7 +30,7 @@ int standard_fractal(
     float* coeffs
 ) {
     try {
-        
+
         static OpenCLContext ctx;
         static bool initialized = false;
 

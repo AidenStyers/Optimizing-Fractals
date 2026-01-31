@@ -97,12 +97,14 @@ class FractalViewer(QWidget):
         }
         """
 
-        color_palette = [
-            51, 51, 255,
-            0, 153, 200,
-            0, 230, 0,
-            51, 51, 255
-        ]
+        palette = [
+            255, 255, 153,
+            153, 255, 153,
+            204, 255, 225,
+            255, 255, 153]
+
+
+        coloring = of.coloring(3, (ctypes.c_int32 * 12)(*palette), 50)
 
         of.generate_standard_fractal(
             view["height"],
@@ -112,8 +114,7 @@ class FractalViewer(QWidget):
             view["center_y"],
             100*math.floor(1 + math.log(1/view["scale"])),
             100,
-            50,
-            color_palette,
+            coloring,
             best_fractal_parameters,
             "displayed_image.png"
         )

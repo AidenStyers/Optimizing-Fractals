@@ -15,6 +15,7 @@ DLL_EXPORT const char* get_last_error(void);
 
 // struct to pass coloring info into standard_fractal
 typedef struct {
+    int32_t coloring_option;
     int32_t palette[12];
     int32_t density;
 } coloring_palette;
