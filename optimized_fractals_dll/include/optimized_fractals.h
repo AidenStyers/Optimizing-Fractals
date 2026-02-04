@@ -88,7 +88,7 @@ DLL_EXPORT int standard_julia(
     int max_iter, // Maximum number of iterations
     int bailout_radius,
     int color_density,
-    int* color_palette, // 4x3 array of colors to use for palette, the four rows each are the RGB for a color used
+    int* color_palette, // 3x3 array of colors to use for palette, the four rows each are the RGB for a color used
     unsigned char* output,
     float cr,
     float ci,
