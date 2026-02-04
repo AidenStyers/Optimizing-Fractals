@@ -80,6 +80,10 @@ The z conjugates also made the resulting fractal more complicated, I am pretty s
 <img src="images/mask_report_graphs/first_16_report.png" height=400 width=400>
 <img src="gallery/best_first_16.png" height=400 width=400>
 
+We can also only use real parameters without conjugates. This lowered the results again, and made an interesting fractal.
+
+<img src="images/mask_report_graphs/real_below_16_report.png" height=400 width=400>
+<img src="gallery/best_first_16_real.png" height=400 width=400>
 
 ## Code Optimization
 
