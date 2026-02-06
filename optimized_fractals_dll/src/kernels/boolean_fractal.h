@@ -1,5 +1,6 @@
 #pragma once
 
+// Faster version of standard_fractal that does no coloring
 static const char* boolean_fractal_source = R"CLC(
 __kernel void boolean_fractal(
     float cx, // X position of center 
