@@ -1,5 +1,4 @@
 # Imports functions from optimized_fractals.dll and nicely packages them
-
 import math
 import ctypes
 import numpy as np
@@ -59,6 +58,9 @@ lib.standard_julia.argtypes = [
     ctypes.POINTER(ctypes.c_float)
 ]
 
+# Easier interface to make coloring class
+def make_coloring(coloring_option, palette, density):
+    return coloring(coloring_option, (ctypes.c_int32 * 12)(*palette), density)
 
 def generate_standard_fractal(
         height, 
