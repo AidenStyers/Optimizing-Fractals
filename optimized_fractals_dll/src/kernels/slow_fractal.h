@@ -1,7 +1,7 @@
 #pragma once
 
-static const char* slow_fractal_source = R"CLC(
 // A version of standard fractal with no precalculation before the iteration, used to see if the optimization actually helped
+static const char* slow_fractal_source = R"CLC(
 __kernel void slow_fractal(
     float cx, // X position of center 
     float cy, // Y position of center

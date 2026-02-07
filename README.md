@@ -97,7 +97,7 @@ How exactly you iterate can give a massive speedup as well. Multiplication is sl
 
 ### What resolution, how many iterations?
 
-When generating fractals, we choose a number of iterations to run before we decide how to color a pixel. The speed of our program is roughly linear with respect to the number of iterations chosen, so we want to choose a small amount of iterations without sacrificing the quality of the result. I found a linear realtion between the resolution of the fractal and the number of iterations needed to ensure a certain level of quality. Look at [iteration_counts.ipynb](iteration_counts.ipynb) for details. 
+When generating fractals, we choose a number of iterations to run before we decide how to color a pixel. The speed of our program is roughly linear with respect to the number of iterations chosen, so we want to choose a small amount of iterations without sacrificing the quality of the result. I found a linear relation between the resolution of the fractal and the number of iterations needed to ensure a certain level of quality. Look at [iteration_counts.ipynb](iteration_counts.ipynb) for details. 
 
 
 

@@ -1,7 +1,7 @@
 #pragma once
 
+// Code to generate julia fractals, not used much yet
 static const char* standard_julia_source = R"CLC(
-
 __kernel void standard_julia(
     float cx, // X position of center 
     float cy, // Y position of center

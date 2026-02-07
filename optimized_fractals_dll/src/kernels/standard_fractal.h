@@ -116,24 +116,24 @@ __kernel void standard_fractal(
             // We interpolate between each RGB value so that the resulting cubic polynomials have derivative zero at each knot
             // The math here is confusing, but its just a lot of linear algebra done beforehand
             if (c < 0.25f) {
-                output[idx + 0] = (uchar) max(coloring->palette[0] + 48*(coloring->palette[3] - coloring->palette[0])*c*c + 128*(coloring->palette[0] - coloring->palette[3])*c*c*c, 0);
-                output[idx + 1] = (uchar) max(coloring->palette[1] + 48*(coloring->palette[4] - coloring->palette[1])*c*c + 128*(coloring->palette[1] - coloring->palette[4])*c*c*c, 0);
-                output[idx + 2] = (uchar) max(coloring->palette[2] + 48*(coloring->palette[5] - coloring->palette[2])*c*c + 128*(coloring->palette[2] - coloring->palette[5])*c*c*c, 0);
+                output[idx + 0] = (uchar) (coloring->palette[0] + 48*(coloring->palette[3] - coloring->palette[0])*c*c + 128*(coloring->palette[0] - coloring->palette[3])*c*c*c);
+                output[idx + 1] = (uchar) (coloring->palette[1] + 48*(coloring->palette[4] - coloring->palette[1])*c*c + 128*(coloring->palette[1] - coloring->palette[4])*c*c*c);
+                output[idx + 2] = (uchar) (coloring->palette[2] + 48*(coloring->palette[5] - coloring->palette[2])*c*c + 128*(coloring->palette[2] - coloring->palette[5])*c*c*c);
             }
             else if (c < 0.5f) {
-                output[idx + 0] = (uchar) max((5*coloring->palette[6] - 4*coloring->palette[3]) + 48*(coloring->palette[3] - coloring->palette[6])*c - 144*(coloring->palette[3] - coloring->palette[6])*c*c + 128*(coloring->palette[3] - coloring->palette[6])*c*c*c, 0);
-                output[idx + 1] = (uchar) max((5*coloring->palette[7] - 4*coloring->palette[4]) + 48*(coloring->palette[4] - coloring->palette[7])*c - 144*(coloring->palette[4] - coloring->palette[7])*c*c + 128*(coloring->palette[4] - coloring->palette[7])*c*c*c, 0);
-                output[idx + 2] = (uchar) max((5*coloring->palette[8] - 4*coloring->palette[5]) + 48*(coloring->palette[5] - coloring->palette[8])*c - 144*(coloring->palette[5] - coloring->palette[8])*c*c + 128*(coloring->palette[5] - coloring->palette[8])*c*c*c, 0);
+                output[idx + 0] = (uchar) ((5*coloring->palette[6] - 4*coloring->palette[3]) + 48*(coloring->palette[3] - coloring->palette[6])*c - 144*(coloring->palette[3] - coloring->palette[6])*c*c + 128*(coloring->palette[3] - coloring->palette[6])*c*c*c);
+                output[idx + 1] = (uchar) ((5*coloring->palette[7] - 4*coloring->palette[4]) + 48*(coloring->palette[4] - coloring->palette[7])*c - 144*(coloring->palette[4] - coloring->palette[7])*c*c + 128*(coloring->palette[4] - coloring->palette[7])*c*c*c);
+                output[idx + 2] = (uchar) ((5*coloring->palette[8] - 4*coloring->palette[5]) + 48*(coloring->palette[5] - coloring->palette[8])*c - 144*(coloring->palette[5] - coloring->palette[8])*c*c + 128*(coloring->palette[5] - coloring->palette[8])*c*c*c);
             }
             else if (c < 0.75f) {
-                output[idx + 0] = (uchar) max((28*coloring->palette[9] - 27*coloring->palette[6]) + 144*(coloring->palette[6] - coloring->palette[9])*c - 240*(coloring->palette[6] - coloring->palette[9])*c*c + 128*(coloring->palette[6] - coloring->palette[9])*c*c*c, 0);
-                output[idx + 1] = (uchar) max((28*coloring->palette[10] - 27*coloring->palette[7]) + 144*(coloring->palette[7] - coloring->palette[10])*c - 240*(coloring->palette[7] - coloring->palette[10])*c*c + 128*(coloring->palette[7] - coloring->palette[10])*c*c*c, 0);
-                output[idx + 2] = (uchar) max((28*coloring->palette[11] - 27*coloring->palette[8]) + 144*(coloring->palette[8] - coloring->palette[11])*c - 240*(coloring->palette[8] - coloring->palette[11])*c*c + 128*(coloring->palette[8] - coloring->palette[11])*c*c*c, 0); 
+                output[idx + 0] = (uchar) ((28*coloring->palette[9] - 27*coloring->palette[6]) + 144*(coloring->palette[6] - coloring->palette[9])*c - 240*(coloring->palette[6] - coloring->palette[9])*c*c + 128*(coloring->palette[6] - coloring->palette[9])*c*c*c);
+                output[idx + 1] = (uchar) ((28*coloring->palette[10] - 27*coloring->palette[7]) + 144*(coloring->palette[7] - coloring->palette[10])*c - 240*(coloring->palette[7] - coloring->palette[10])*c*c + 128*(coloring->palette[7] - coloring->palette[10])*c*c*c);
+                output[idx + 2] = (uchar) ((28*coloring->palette[11] - 27*coloring->palette[8]) + 144*(coloring->palette[8] - coloring->palette[11])*c - 240*(coloring->palette[8] - coloring->palette[11])*c*c + 128*(coloring->palette[8] - coloring->palette[11])*c*c*c); 
             }
             else {
-                output[idx + 0] = (uchar) max((81*coloring->palette[0] - 80*coloring->palette[9]) + 288*(coloring->palette[9] - coloring->palette[0])*c - 336*(coloring->palette[9] - coloring->palette[0])*c*c + 128*(coloring->palette[9] - coloring->palette[0])*c*c*c, 0);
-                output[idx + 1] = (uchar) max((81*coloring->palette[1] - 80*coloring->palette[10]) + 288*(coloring->palette[11] - coloring->palette[1])*c - 336*(coloring->palette[10] - coloring->palette[1])*c*c + 128*(coloring->palette[10] - coloring->palette[1])*c*c*c, 0);
-                output[idx + 2] = (uchar) max((81*coloring->palette[2] - 80*coloring->palette[11]) + 288*(coloring->palette[10] - coloring->palette[2])*c - 336*(coloring->palette[11] - coloring->palette[2])*c*c + 128*(coloring->palette[11] - coloring->palette[2])*c*c*c, 0);
+                output[idx + 0] = (uchar) ((81*coloring->palette[0] - 80*coloring->palette[9]) + 288*(coloring->palette[9] - coloring->palette[0])*c - 336*(coloring->palette[9] - coloring->palette[0])*c*c + 128*(coloring->palette[9] - coloring->palette[0])*c*c*c);
+                output[idx + 1] = (uchar) ((81*coloring->palette[1] - 80*coloring->palette[10]) + 288*(coloring->palette[11] - coloring->palette[1])*c - 336*(coloring->palette[10] - coloring->palette[1])*c*c + 128*(coloring->palette[10] - coloring->palette[1])*c*c*c);
+                output[idx + 2] = (uchar) ((81*coloring->palette[2] - 80*coloring->palette[11]) + 288*(coloring->palette[10] - coloring->palette[2])*c - 336*(coloring->palette[11] - coloring->palette[2])*c*c + 128*(coloring->palette[11] - coloring->palette[2])*c*c*c);
             }
         }
     }

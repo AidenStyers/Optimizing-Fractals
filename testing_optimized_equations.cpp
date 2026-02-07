@@ -2,8 +2,10 @@
 #include <iostream>
 #include <complex>
 
+// Tests the accuracy as well as speed of optimized equations
+// Uses C++s complex library as a benchmark
 
-// Function which calculates normal style
+// Function which calculates without optimization
 std::complex<float> normal_calc(float zr, float zi, float cr, float ci, float coeffs[]) {
 
     // Convert all inputs to std::complex
@@ -84,39 +86,31 @@ int main() {
 
     std::uniform_real_distribution<float> dist(-1.0f, 1.0f);
 
-    float zr = dist(engine);
-    float zi = dist(engine);
-    float cr = dist(engine);
-    float ci = dist(engine);
+    // Test that equations give the same output for 1000 random inputs
+    for (int iter = 0; iter<1000; iter++){
 
-    float coeffs[52];
+        float zr = dist(engine);
+        float zi = dist(engine);
+        float cr = dist(engine);
+        float ci = dist(engine);
 
-    for (int i = 0; i<52; i++) {
-        coeffs[i] = dist(engine);
+        float coeffs[52];
+
+        for (int i = 0; i<52; i++) {
+            coeffs[i] = dist(engine);
+        }
+
+        // Calculate normal style
+        std::complex<float> normal = normal_calc(zr, zi, cr, ci, coeffs);
+        std::complex<float> optimal = optimal_calc(zr, zi, cr, ci, coeffs);
+
+        if (std::abs(normal - optimal) > 0.00001f){ // Give leeway for floating point errors
+                std::cout << "Equations did not match!" << std::endl;
+                std::cout << "Correct value: " << normal << std::endl;
+                std::cout << "Optimized equation got: " << optimal << std::endl;
+                exit(1);
+        }
     }
 
-    // Calculate normal style
-    std::cout << "Normal: " << normal_calc(zr, zi, cr, ci, coeffs) << std::endl;
-
-    // Calculate crazy style
-    std::cout << "Optimal: " << optimal_calc(zr, zi, cr, ci, coeffs) << std::endl;
-
-    for (int i = 0; i<26; i++) {
-        coeffs[2*i] = 1.0f;
-        coeffs[2*i+1] = 0.0f;
-    }
-
-    // Test on all 1's
-    std::cout << "Normal Test: " << normal_calc(1.0f, 0.0f, 1.0f, 0.0f, coeffs) << std::endl;
-    std::cout << "Optimal Test: " << optimal_calc(1.0f, 0.0f, 1.0f, 0.0f, coeffs) << std::endl;
-
-    for (int i = 0; i<52; i++) {
-        coeffs[i] = 0.0f;
-    }
-
-    coeffs[0] = 1.0f;
-    coeffs[10] = 1.0f;
-
-    std::cout << "Mandelbrot testing:" << std::endl;
-    std::cout << "Mandelbrot testing:" << std::endl;
+    std::cout << "No errors found!" << std::endl;
 }
