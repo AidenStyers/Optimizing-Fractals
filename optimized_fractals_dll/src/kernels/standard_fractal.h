@@ -132,8 +132,8 @@ __kernel void standard_fractal(
             }
             else {
                 output[idx + 0] = (uchar) ((81*coloring->palette[0] - 80*coloring->palette[9]) + 288*(coloring->palette[9] - coloring->palette[0])*c - 336*(coloring->palette[9] - coloring->palette[0])*c*c + 128*(coloring->palette[9] - coloring->palette[0])*c*c*c);
-                output[idx + 1] = (uchar) ((81*coloring->palette[1] - 80*coloring->palette[10]) + 288*(coloring->palette[11] - coloring->palette[1])*c - 336*(coloring->palette[10] - coloring->palette[1])*c*c + 128*(coloring->palette[10] - coloring->palette[1])*c*c*c);
-                output[idx + 2] = (uchar) ((81*coloring->palette[2] - 80*coloring->palette[11]) + 288*(coloring->palette[10] - coloring->palette[2])*c - 336*(coloring->palette[11] - coloring->palette[2])*c*c + 128*(coloring->palette[11] - coloring->palette[2])*c*c*c);
+                output[idx + 1] = (uchar) ((81*coloring->palette[1] - 80*coloring->palette[10]) + 288*(coloring->palette[10] - coloring->palette[1])*c - 336*(coloring->palette[10] - coloring->palette[1])*c*c + 128*(coloring->palette[10] - coloring->palette[1])*c*c*c);
+                output[idx + 2] = (uchar) ((81*coloring->palette[2] - 80*coloring->palette[11]) + 288*(coloring->palette[11] - coloring->palette[2])*c - 336*(coloring->palette[11] - coloring->palette[2])*c*c + 128*(coloring->palette[11] - coloring->palette[2])*c*c*c);
             }
         }
     }

@@ -117,8 +117,8 @@ __kernel void standard_julia(
             }
             else {
                 output[idx + 0] = (uchar) ((81*color_palette[0] - 80*color_palette[9]) + 288*(color_palette[9] - color_palette[0])*c - 336*(color_palette[9] - color_palette[0])*c*c + 128*(color_palette[9] - color_palette[0])*c*c*c);
-                output[idx + 1] = (uchar) ((81*color_palette[1] - 80*color_palette[10]) + 288*(color_palette[11] - color_palette[1])*c - 336*(color_palette[10] - color_palette[1])*c*c + 128*(color_palette[10] - color_palette[1])*c*c*c);
-                output[idx + 2] = (uchar) ((81*color_palette[2] - 80*color_palette[11]) + 288*(color_palette[10] - color_palette[2])*c - 336*(color_palette[11] - color_palette[2])*c*c + 128*(color_palette[11] - color_palette[2])*c*c*c);
+                output[idx + 1] = (uchar) ((81*color_palette[1] - 80*color_palette[10]) + 288*(color_palette[10] - color_palette[1])*c - 336*(color_palette[10] - color_palette[1])*c*c + 128*(color_palette[10] - color_palette[1])*c*c*c);
+                output[idx + 2] = (uchar) ((81*color_palette[2] - 80*color_palette[11]) + 288*(color_palette[11] - color_palette[2])*c - 336*(color_palette[11] - color_palette[2])*c*c + 128*(color_palette[11] - color_palette[2])*c*c*c);
             }
         }
     }
