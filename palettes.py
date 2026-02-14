@@ -1,3 +1,6 @@
+# Some palettes I like
+# Each row of three integers is responsible for a color
+
 earth = [
     139, 69, 19,
     34, 139, 34,
